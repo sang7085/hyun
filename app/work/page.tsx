@@ -1,52 +1,27 @@
 'use client';
 
-import { useLayoutEffect, useRef } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
+import { useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useVisualStore } from '@/store/useVisualStore';
-import { blur } from 'three/tsl';
-
-
+import workData from '@/data/projects';
+import { usePageTransition } from '@/hooks/usePageTransition';
 gsap.registerPlugin(ScrollTrigger);
-
-const workItems = [
-  { href: '/work', src: '/assets/images/work-bg1.jpg', title: "HD HYUNDAI" },
-  { href: '/work2', src: '/assets/images/work-bg2.jpg', title: "HD HYUNDAI" },
-  { href: '/work3', src: '/assets/images/work-bg3.png', title: "HD HYUNDAI" },
-  { href: '/work4', src: '/assets/images/work-bg4.png', title: "HD HYUNDAI" },
-];
-
-const workItemsAll = [
-  { href: '/work', src: '/assets/images/work-bg1.jpg', title: "HD HYUNDAI" },
-  { href: '/work2', src: '/assets/images/work-bg2.jpg', title: "HD HYUNDAI" },
-  { href: '/work3', src: '/assets/images/work-bg3.png', title: "HD HYUNDAI" },
-  { href: '/work4', src: '/assets/images/work-bg4.png', title: "HD HYUNDAI" },
-  { href: '/work', src: '/assets/images/work-bg1.jpg', title: "HD HYUNDAI" },
-  { href: '/work2', src: '/assets/images/work-bg2.jpg', title: "HD HYUNDAI" },
-  { href: '/work3', src: '/assets/images/work-bg3.png', title: "HD HYUNDAI" },
-  { href: '/work4', src: '/assets/images/work-bg4.png', title: "HD HYUNDAI" },
-]
-
-const textItems = [
-  'HD HYUNDAI HD HYUNDAI HD HYUNDAI HD HYUNDAI HD HYUNDAI HD HYUNDAI HD HYUNDAI HD HYUNDAI HD HYUNDAI',
-  'HYUNDAI ROTEM HYUNDAI ROTEM HYUNDAI ROTEM HYUNDAI ROTEM HYUNDAI ROTEM HYUNDAI ROTEM HYUNDAI ROTEM HYUNDAI ROTEM',
-  'KIA MOTORS KIA MOTORS KIA MOTORS KIA MOTORS KIA MOTORS KIA MOTORS KIA MOTORS KIA MOTORS',
-  'SAMSUNG SAMSUNG SAMSUNG SAMSUNG SAMSUNG SAMSUNG SAMSUNG SAMSUNG SAMSUNG SAMSUNG SAMSUNG',
-];
 
 export default function WorkPage() {
   const sectionRef = useRef(null);
   const wrapRef = useRef(null);
   const isVisualReady = useVisualStore((s) => s.isVisualReady);
+  const { navigate } = usePageTransition();
+  const [activeIndex, setActiveIndex] = useState(0);
 
   useLayoutEffect(() => {
     if (!isVisualReady) return;
+    console.log('isVisualReady:', isVisualReady);
     const ctx = gsap.context(() => {
       const items = gsap.utils.toArray<HTMLElement>('.work-item');
       const textEls = gsap.utils.toArray<HTMLElement>('.work-text-item');
-      const totalFlips = workItems.length - 1;
+      const totalFlips = workData.length - 1;
 
       gsap.set(textEls, {
         yPercent: 100,
@@ -61,10 +36,13 @@ export default function WorkPage() {
           rotateX: i % 2 === 0 ? 0 : 180,
           z: i * -1,
           opacity: 0,
+          visibility: 'hidden',
+          // pointerEvents: 'none',
         });
 
         gsap.set([items[0], items[1]], {
           opacity: 1,
+          visibility: 'visible',
         });
       });
 
@@ -72,63 +50,68 @@ export default function WorkPage() {
         scrollTrigger: {
           trigger: sectionRef.current,
           start: 'top top',
-          end: `+=${totalFlips * 200}%`,
+          end: `+=${totalFlips * 100}%`,
           scrub: true,
           pin: true,
-          // markers: true,
+          onUpdate: (self) => {
+            const index = Math.round(self.progress * totalFlips);
+            setActiveIndex(index);
+          },
         },
       });
 
       for (let i = 0; i < totalFlips; i++) {
-
-        // 다음 카드 미리 준비
         if (items[i + 1]) {
           tl.set(
-            items[i + 1], {
-            opacity: 1,
-          }, i);
+            items[i + 1],
+            {
+              opacity: 1,
+              // pointerEvents: 'auto'
+              visibility: 'visible',
+            },
+            i
+          );
         }
 
-        // 현재 카드 숨김
         if (items[i]) {
-          tl.set(items[i], {
-            opacity: 0,
-          }, i + 1);
+          tl.set(
+            items[i],
+            {
+              opacity: 0,
+              visibility: 'hidden',
+              // pointerEvents: 'none'
+            },
+            i + 1
+          );
         }
-
 
         tl.to(
           wrapRef.current,
           {
             rotateX: (i + 1) * 180,
             ease: 'power2.out',
-            // duration: 1,
           },
           i
         );
 
-        // 현재 텍스트 위로
         if (textEls[i]) {
           tl.to(
             textEls[i],
             {
               yPercent: -200,
               ease: 'power2.out',
-              // duration: 1,
             },
             i
           );
         }
 
-        // 다음 텍스트 중앙
         if (textEls[i + 1]) {
           tl.to(
             textEls[i + 1],
             {
               yPercent: -50,
-              filter: "blur(0px)",
+              filter: 'blur(0px)',
               ease: 'power2.out',
-              // duration: 1,
             },
             i
           );
@@ -136,70 +119,79 @@ export default function WorkPage() {
       }
     }, sectionRef);
 
-    return () => ctx.revert();
-
+    return () => {
+      ctx.revert();
+      ScrollTrigger.getAll().forEach((st) => st.kill());
+    };
   }, [isVisualReady]);
 
-  // content mouse over 시 함수
-  const handleEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleEnter = (e: React.MouseEvent<HTMLElement>) => {
     const el = e.currentTarget;
-    el.classList.remove("active-up", "active-down");
+    el.classList.remove('active-up', 'active-down');
   };
-  const handleLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
+
+  const handleLeave = (e: React.MouseEvent<HTMLElement>) => {
     const el = e.currentTarget;
     const rect = el.getBoundingClientRect();
     const centerY = rect.top + rect.height / 2;
 
     if (e.clientY < centerY) {
-      el.classList.add("active-up");
+      el.classList.add('active-up');
     } else {
-      el.classList.add("active-down");
+      el.classList.add('active-down');
     }
   };
 
-
   return (
     <>
-      <section className="work-section">
+      <section id="work" className="work-section">
         <div className="flip-wrap" ref={sectionRef}>
           <ul className="text-item-wrap">
-            {textItems.map((text, i) => (
+            {workData.map((project, i) => (
               <li key={i} className="work-text-item">
-                <span>{text}{text}</span>
+                <span onClick={() => navigate(`/work/${project.slug}`)}>{project.marquee.repeat(2)}</span>
               </li>
             ))}
           </ul>
           <div className="work-item-wrap" ref={wrapRef}>
-            {workItems.map((work, i) => (
+            {workData.map((project, i) => (
               <div key={i} className="work-item">
-                <Link href={work.href}>
-                  <div className="desc">{work.title}</div>
-                  {/* <video src={work.src} autoPlay muted loop playsInline /> */}
-                  <img src={work.src} alt={`Work ${i + 1}`} />
-                </Link>
+                <div className="desc">{project.title}</div>
+                <img src={project.thumbnail} alt={project.title} />
               </div>
             ))}
           </div>
+          <div className="real-work">
+            {workData.map((project, i) => (
+              <div
+                key={i}
+                className="real-work-item"
+                style={{
+                  zIndex: workData.length - i,
+                  pointerEvents: activeIndex === i ? 'auto' : 'none',
+                }}
+                onClick={() => navigate(`/work/${project.slug}`)}
+              ></div>
+            ))}
+          </div>
         </div>
-        <div className="content_wrap">
-          {workItemsAll.map((item, i) => (
-            <Link
-              key={i}
-              href="#"
-              className="content_list"
-              onMouseEnter={handleEnter}
-              onMouseLeave={handleLeave}
-            >
-              <div className="content-wrap">
-                <div className="tit_wrap">
-                  <h3 className="tit">{item.title}</h3>
-                </div>
-                <div className="other">
-                  <span className="update">LAST</span>
-                  <span className="date">2025.01.01</span>
+        <div className="content-wrap">
+          <div className="inner">
+            <p className="all-title">[ALL WORKS]</p>
+          </div>
+          {workData.map((project, i) => (
+            <div key={i} className="content-list" onClick={() => navigate(`/work/${project.slug}`)} onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+              <div className="info-wrap">
+                <div className="inner">
+                  <div className="tit-wrap">
+                    <h3 className="tit">{project.title}</h3>
+                  </div>
+                  <div className="text-wrap">
+                    <p>{project.year}</p>
+                  </div>
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </section>

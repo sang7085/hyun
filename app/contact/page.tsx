@@ -2,23 +2,19 @@
 
 import { useEffect, useRef } from 'react';
 import Matter from 'matter-js';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useVisualStore } from '@/store/useVisualStore';
+gsap.registerPlugin(ScrollTrigger);
 
 export default function ContactPage() {
   const sceneRef = useRef<HTMLDivElement | null>(null);
+  const isVisualReady = useVisualStore((s) => s.isVisualReady);
 
   useEffect(() => {
-    if (!sceneRef.current) return;
+    if (!sceneRef.current || !isVisualReady) return;
 
-    const {
-      Engine,
-      Render,
-      Runner,
-      Bodies,
-      Composite,
-      Mouse,
-      MouseConstraint,
-      Body,
-    } = Matter;
+    const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Body } = Matter;
 
     const section = sceneRef.current;
 
@@ -26,6 +22,17 @@ export default function ContactPage() {
     const height = section.clientHeight;
 
     const engine = Engine.create();
+    engine.gravity.y = 0;
+
+    const trigger = ScrollTrigger.create({
+      trigger: section,
+      start: 'top 70%',
+      // markers: true,
+
+      onEnter: () => {
+        engine.gravity.y = 1;
+      },
+    });
 
     const render = Render.create({
       element: section,
@@ -38,103 +45,65 @@ export default function ContactPage() {
       },
     });
 
-
     const balls = Array.from({ length: 30 }, () => {
       const radius = Math.random() * 40 + 40; // 40~80
+      const faceNum = Math.floor(Math.random() * 5) + 1; // 1~5 랜덤
 
-      return Bodies.circle(
-        Math.random() * (width - 100) + 50,
-        Math.random() * 200,
-        radius,
-        {
-          restitution: 0.8,
-          friction: 0.01,
-          frictionAir: 0.01,
-          render: {
-            sprite: {
-              texture: '/assets/images/faceball.png',
-              xScale: (radius * 2) / 1450,
-              yScale: (radius * 2) / 1386,
-            },
+      return Bodies.circle(Math.random() * (width - 100) + 50, Math.random() * 200, radius, {
+        restitution: 0.8,
+        friction: 0.01,
+        frictionAir: 0.01,
+        render: {
+          sprite: {
+            texture: `/assets/images/faceball${faceNum}.png`,
+            xScale: (radius * 2) / 750,
+            yScale: (radius * 2) / 750,
           },
-        }
-      );
+        },
+      });
     });
 
-    const floor = Bodies.rectangle(
-      width / 2,
-      height + 20,
-      width,
-      40,
-      {
-        isStatic: true,
-        render: {
-          fillStyle: '#000',
-        },
-      }
-    );
+    const floor = Bodies.rectangle(width / 2, height + 20, width, 40, {
+      isStatic: true,
+      render: {
+        fillStyle: '#000',
+      },
+    });
 
-    const leftWall = Bodies.rectangle(
-      -20,
-      height / 2,
-      40,
-      height,
-      {
-        isStatic: true,
-        render: {
-          visible: false,
-        },
-      }
-    );
+    const leftWall = Bodies.rectangle(-20, height / 2, 40, height, {
+      isStatic: true,
+      render: {
+        visible: false,
+      },
+    });
 
-    const rightWall = Bodies.rectangle(
-      width + 20,
-      height / 2,
-      40,
-      height,
-      {
-        isStatic: true,
-        render: {
-          visible: false,
-        },
-      }
-    );
+    const rightWall = Bodies.rectangle(width + 20, height / 2, 40, height, {
+      isStatic: true,
+      render: {
+        visible: false,
+      },
+    });
 
-    const topWall = Bodies.rectangle(
-      width / 2,
-      -20,
-      width,
-      40,
-      {
-        isStatic: true,
-        render: {
-          visible: false,
-        },
-      }
-    );
+    const topWall = Bodies.rectangle(width / 2, -20, width, 40, {
+      isStatic: true,
+      render: {
+        visible: false,
+      },
+    });
 
-    Composite.add(engine.world, [
-      ...balls,
-      floor,
-      leftWall,
-      rightWall,
-      topWall,
-    ]);
+    Composite.add(engine.world, [...balls, floor, leftWall, rightWall, topWall]);
 
     const mouse = Mouse.create(render.canvas);
 
-    const mouseConstraint = MouseConstraint.create(
-      engine,
-      {
-        mouse,
-        constraint: {
-          stiffness: 0.15,
-          render: {
-            visible: false,
-          },
+    const mouseConstraint = MouseConstraint.create(engine, {
+      mouse,
+      constraint: {
+        stiffness: 0.15,
+        render: {
+          visible: false,
         },
-      }
-    );
+      },
+    });
 
     Composite.add(engine.world, mouseConstraint);
 
@@ -153,86 +122,48 @@ export default function ContactPage() {
         const dx = ball.position.x - mouseX;
         const dy = ball.position.y - mouseY;
 
-        const distance = Math.sqrt(
-          dx * dx + dy * dy
-        );
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < 120) {
           const force = (120 - distance) * 0.000005;
 
-          Body.applyForce(
-            ball,
-            ball.position,
-            {
-              x: dx * force,
-              y: dy * force,
-            }
-          );
+          Body.applyForce(ball, ball.position, {
+            x: dx * force,
+            y: dy * force,
+          });
         }
       });
     };
 
-    window.addEventListener(
-      'mousemove',
-      handleMouseMove
-    );
+    window.addEventListener('mousemove', handleMouseMove);
 
     Render.run(render);
-
     const runner = Runner.create();
     Runner.run(runner, engine);
 
     return () => {
-      window.removeEventListener(
-        'mousemove',
-        handleMouseMove
-      );
+      trigger.kill();
+      window.removeEventListener('mousemove', handleMouseMove);
 
       Render.stop(render);
       Runner.stop(runner);
 
-      Composite.clear(
-        engine.world,
-        false
-      );
+      Composite.clear(engine.world, false);
       Engine.clear(engine);
 
       render.canvas.remove();
     };
-  }, []);
+  }, [isVisualReady]);
 
   return (
     <>
-      <section
-        className='contact-section'
-        style={{
-          position: 'relative',
-        }}
-      >
+      <section id="contact" className="contact-section">
         <div className="contact-wrap">
-          <p
-            style={{
-              fontSize: "3vw",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              color: "#fff"
-
-            }}
-          >contact</p>
+          <a href="mailto:sang7085@gmail.com" className="contact">
+            CONTACT
+          </a>
         </div>
-        <div
-          className='matter-wrap'
-          ref={sceneRef}
-          style={{
-            position: "absolute",
-            inset: "0",
-            width: '100%',
-            height: '100vh',
-            overflow: 'hidden',
-            background: 'linear-gradient(180deg, #F4F2F1 0%, #D9D4D2 100%)',
-            // pointerEvents: "none",
-          }}></div>
+        <div className="matter-wrap" ref={sceneRef}></div>
       </section>
     </>
   );
