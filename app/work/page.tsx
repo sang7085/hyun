@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import Image from 'next/image';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useVisualStore } from '@/store/useVisualStore';
 import workData from '@/data/projects';
@@ -157,7 +158,7 @@ export default function WorkPage() {
             {workData.map((project, i) => (
               <div key={i} className="work-item">
                 <div className="desc">{project.title}</div>
-                <img src={project.thumbnail} alt={project.title} />
+                <Image src={project.thumbnail} alt={project.title} fill sizes="(max-width: 768px) 100vw, 384px" />
               </div>
             ))}
           </div>

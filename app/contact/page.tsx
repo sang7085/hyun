@@ -55,7 +55,7 @@ export default function ContactPage() {
         frictionAir: 0.01,
         render: {
           sprite: {
-            texture: `/assets/images/faceball${faceNum}.png`,
+            texture: `/assets/images/faceball${faceNum}.webp`,
             xScale: (radius * 2) / 750,
             yScale: (radius * 2) / 750,
           },

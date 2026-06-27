@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { useVisualStore } from '@/store/useVisualStore';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -34,7 +35,7 @@ export default function VisualPage() {
     },
   ];
 
-  const frames = Array.from({ length: 20 }, (_, i) => `/sequence/frame_${String(i + 1).padStart(2, '0')}.png`);
+  const frames = Array.from({ length: 20 }, (_, i) => `/sequence/frame_${String(i + 1).padStart(2, '0')}.webp`);
 
   useLayoutEffect(() => {
     // ── Three.js 세팅 ──
@@ -62,8 +63,13 @@ export default function VisualPage() {
 
     // ── GSAP Context ──
     const ctx = gsap.context(() => {
+      const dracoLoader = new DRACOLoader();
+      dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+
       const loader = new GLTFLoader();
-      loader.load('/model/mycharactor2.glb', (gltf) => {
+      loader.setDRACOLoader(dracoLoader);
+
+      loader.load('/model/mycharactor2-draco.glb', (gltf) => {
         model = gltf.scene;
         const box = new THREE.Box3().setFromObject(model);
         const center = box.getCenter(new THREE.Vector3());
@@ -188,7 +194,7 @@ export default function VisualPage() {
     <section id="visual" className="visual-section" aria-label="비주얼 섹션">
       <div className="section-pin-wrap" ref={sectionRef}>
         <div className="img-box">
-          <img className="sequence-image" ref={sequenceRef} src="/sequence/frame_01.png" alt="시퀀스 애니메이션 이미지" />
+          <img className="sequence-image" ref={sequenceRef} src="/sequence/frame_01.webp" alt="시퀀스 애니메이션 이미지" />
         </div>
         <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
           <defs>
