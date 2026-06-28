@@ -159,11 +159,11 @@ export default function ContactPage() {
     <>
       <section id="contact" className="contact-section">
         <div className="contact-wrap">
-          <a href="mailto:sang7085@gmail.com" className="contact">
+          <a href="mailto:sang7085@gmail.com" className="contact" aria-label="이메일로 연락하기 (sang7085@gmail.com)">
             CONTACT
           </a>
         </div>
-        <div className="matter-wrap" ref={sceneRef}></div>
+        <div className="matter-wrap" ref={sceneRef} aria-hidden="true" role="presentation" />
       </section>
     </>
   );

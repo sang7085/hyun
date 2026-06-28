@@ -145,12 +145,17 @@ export default function WorkPage() {
 
   return (
     <>
-      <section id="work" className="work-section">
+      <section id="work" className="work-section" aria-labelledby="work section">
+        <h2 id="visual-heading" className="sr-only">
+          Work
+        </h2>
         <div className="flip-wrap" ref={sectionRef}>
           <ul className="text-item-wrap">
             {workData.map((project, i) => (
               <li key={i} className="work-text-item">
-                <span onClick={() => navigate(`/work/${project.slug}`)}>{project.marquee.repeat(2)}</span>
+                <button type="button" tabIndex={-1} onClick={() => navigate(`/work/${project.slug}`)} className="marquee-btn">
+                  {project.marquee.repeat(2)}
+                </button>
               </li>
             ))}
           </ul>
@@ -164,15 +169,18 @@ export default function WorkPage() {
           </div>
           <div className="real-work">
             {workData.map((project, i) => (
-              <div
+              <button
                 key={i}
+                role="button"
+                aria-label={`${project.title} 상세 보기`}
                 className="real-work-item"
                 style={{
                   zIndex: workData.length - i,
-                  pointerEvents: activeIndex === i ? 'auto' : 'none',
                 }}
                 onClick={() => navigate(`/work/${project.slug}`)}
-              ></div>
+                tabIndex={0}
+                aria-hidden={false}
+              />
             ))}
           </div>
         </div>
@@ -181,7 +189,7 @@ export default function WorkPage() {
             <p className="all-title">[ALL WORKS]</p>
           </div>
           {workData.map((project, i) => (
-            <div key={i} className="content-list" onClick={() => navigate(`/work/${project.slug}`)} onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+            <button type="button" key={i} className="content-list" onClick={() => navigate(`/work/${project.slug}`)} onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
               <div className="info-wrap">
                 <div className="inner">
                   <div className="tit-wrap">
@@ -192,7 +200,7 @@ export default function WorkPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       </section>

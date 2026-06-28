@@ -1,12 +1,13 @@
 'use client';
 
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { useVisualStore } from '@/store/useVisualStore';
+import { useLoadingStore } from '@/store/useLoadingStore';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -18,6 +19,7 @@ export default function VisualPage() {
   const textRef1 = useRef<HTMLDivElement>(null);
   const textRef2 = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<HTMLDivElement[]>([]);
+  const isLoading = useLoadingStore((state) => state.isLoading); // loading 끝났는 지   여부
   const setVisualReady = useVisualStore((s) => s.setVisualReady); // visual 섹션 scrollTrigger가 활성화되면 true로 변경
 
   const items = [
@@ -36,6 +38,37 @@ export default function VisualPage() {
   ];
 
   const frames = Array.from({ length: 20 }, (_, i) => `/sequence/frame_${String(i + 1).padStart(2, '0')}.webp`);
+
+  // ── loading 끝나고 visual 모션 스타트 ─
+  useEffect(() => {
+    if (isLoading) return;
+
+    const lines1 = textRef1.current?.querySelectorAll('.visual-tit-line');
+    const lines2 = textRef2.current?.querySelectorAll('.visual-tit-line');
+
+    const tl = gsap.timeline();
+
+    tl.to(lines1 ?? [], {
+      y: '0%',
+      duration: 0.8,
+      ease: 'power2.out',
+      stagger: 0.15,
+    });
+
+    tl.to(
+      lines2 ?? [],
+      {
+        y: '0%',
+        duration: 0.8,
+        ease: 'power2.out',
+        stagger: 0.15,
+      },
+      '-=0.2'
+    );
+  }, [isLoading]);
+
+  // ── loading 끝나고 visual 모션 엔드 ─
+  // ── visual 스크롤모션 스타트 ──
 
   useLayoutEffect(() => {
     // ── Three.js 세팅 ──
@@ -191,7 +224,10 @@ export default function VisualPage() {
   }, []);
 
   return (
-    <section id="visual" className="visual-section" aria-label="비주얼 섹션">
+    <section id="visual" className="visual-section" aria-label="visual section">
+      <h2 id="visual-heading" className="sr-only">
+        Visual
+      </h2>
       <div className="section-pin-wrap" ref={sectionRef}>
         <div className="img-box">
           <img className="sequence-image" ref={sequenceRef} src="/sequence/frame_01.webp" alt="시퀀스 애니메이션 이미지" />
@@ -204,19 +240,28 @@ export default function VisualPage() {
           </defs>
         </svg>
         <div className="gear-wrap" ref={gearRef} aria-hidden="true"></div>
+
         <div className="title-wrap" ref={textRef1}>
-          {/* <h2 className="visual-sub-tit">CREATIVE PUBLISHER</h2> */}
           <h2 className="visual-tit">
-            USER <br />
-            EXPERIENCE
+            <span className="visual-tit-line-wrap">
+              <span className="visual-tit-line">INTERACTIVE</span>
+            </span>
+            <span className="visual-tit-line-wrap">
+              <span className="visual-tit-line">PUBLISHING</span>
+            </span>
           </h2>
         </div>
         <div className="title-wrap right" ref={textRef2}>
-          {/* <h2 className="visual-sub-tit">CREATIVE PUBLISHER</h2> */}
           <h2 className="visual-tit">
-            INTERACTIVE <br /> PUBLISHING
+            <span className="visual-tit-line-wrap">
+              <span className="visual-tit-line">USER</span>
+            </span>
+            <span className="visual-tit-line-wrap">
+              <span className="visual-tit-line">EXPERIENCE</span>
+            </span>
           </h2>
         </div>
+
         <canvas
           aria-hidden="true"
           ref={canvasRef}

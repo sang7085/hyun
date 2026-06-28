@@ -1,4 +1,3 @@
-// hooks/usePageTransition.ts
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -10,35 +9,54 @@ export function usePageTransition() {
   const setTransitionDone = useTransitionStore((s) => s.setTransitionDone);
 
   const navigate = (href: string) => {
-    const overlay = document.createElement('div');
-    overlay.style.cssText = `
+    const overlayWhite = document.createElement('div');
+    overlayWhite.style.cssText = `
       position: fixed;
       inset: 0;
       background: #f4f2f1;
       z-index: 9999;
-      clip-path: circle(0% at 50% 50%);
+      transform: scale(0);
+      transform-origin: center;
       pointer-events: none;
     `;
-    document.body.appendChild(overlay);
+
+    const overlayBlack = document.createElement('div');
+    overlayBlack.style.cssText = `
+      position: fixed;
+      inset: 0;
+      background: #000;
+      z-index: 10000;
+      transform: scale(0);
+      transform-origin: center;
+      pointer-events: none;
+    `;
+
+    document.body.appendChild(overlayWhite);
+    document.body.appendChild(overlayBlack);
 
     gsap
       .timeline()
-      // 커지는 애니메이션
-      .to(overlay, {
-        clipPath: 'circle(150% at 50% 50%)',
-        duration: 1.5,
-        ease: 'power2.inOut',
+      .to(overlayWhite, {
+        scale: 1,
+        duration: 0.6,
+        ease: 'cubic-bezier(0.7, 0, 1, 1)',
         onComplete: () => router.push(href),
       })
-      // 페이지 이동 후 줄어드는 애니메이션
-      .to(overlay, {
-        clipPath: 'circle(0% at 50% 50%)',
-        duration: 1,
-        ease: 'power2.inOut',
-        delay: 0.1,
+      .to(overlayBlack, {
+        delay: 0.6,
+        scale: 1,
+        duration: 0.6,
+        ease: 'cubic-bezier(0.4, 0, 1, 1)',
+      })
+      // 둘 다 동시에 fadeout
+      .to([overlayWhite, overlayBlack], {
+        opacity: 0,
+        duration: 0.6,
+        ease: 'none',
         onComplete: () => {
-          setTransitionDone(true); // zustand로 완료 알림
-          document.body.removeChild(overlay);
+          setTransitionDone(true);
+          document.body.removeChild(overlayWhite);
+          document.body.removeChild(overlayBlack);
         },
       });
   };

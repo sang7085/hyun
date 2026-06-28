@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
-
 import '@/styles/main.scss';
 import { pretendard, russoOne, anton } from '@/utils/fonts';
 import Header from './components/layout/header';
 import LenisProvider from '@/app/components/provider/LenisProvider';
+import ScrollToTop from '@/app/components/layout/scrollToTop';
+import Loading from './components/layout/loading';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://hyun-three.vercel.app/'),
@@ -20,10 +21,10 @@ export const metadata: Metadata = {
     follow: true,
   },
 
-  icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-icon.png',
-  },
+  // icons: {
+  //   icon: '/favicon.ico',
+  //   apple: '/apple-icon.png',
+  // },
 };
 
 export default function RootLayout({
@@ -34,7 +35,9 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${pretendard.variable} ${russoOne.variable} ${anton.variable}`}>
       <body>
+        <Loading />
         <LenisProvider>
+          <ScrollToTop />
           <Header />
           <main>{children}</main>
         </LenisProvider>

@@ -15,12 +15,19 @@ body {
 }
 
 body {
+  word-break: keep-all;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-a {
+a,
+button {
+  cursor: pointer;
   display: block;
+  &:focus-visible {
+    outline: 2px solid red;
+    outline-offset: 4px;
+  }
 }
 
 video,

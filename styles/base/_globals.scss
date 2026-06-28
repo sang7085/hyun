@@ -9,6 +9,21 @@ body {
   margin: 0 auto;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+
+  white-space: nowrap;
+  border: 0;
+}
+
 header {
   position: fixed;
   top: 0;
@@ -66,18 +81,44 @@ main {
   background-color: #000;
 }
 
-.loading {
+.loading-wrap {
   position: fixed;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  inset: 0;
   width: 100%;
-  height: 100vh;
-  background: #fff;
-  transition: opacity 0.8s ease;
+  height: 100%;
+  background: #000;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  &.fade-out {
-    opacity: 0;
-    pointer-events: none;
+  .loading-container {
+    overflow: hidden;
+    height: 3rem;
+  }
+
+  .loading-wrapper {
+    transform: translateY(100%);
+  }
+
+  .loading-list {
+    text-align: center;
+  }
+
+  .loading-item {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+
+    &--hyun {
+      overflow: hidden;
+    }
+  }
+
+  .loading-char {
+    display: inline-block;
   }
 }

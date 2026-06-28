@@ -57,6 +57,9 @@
       transform: translateY(-50%);
       width: 30vw;
       color: #fff;
+      opacity: 0;
+      transform: translateY(100px);
+      filter: blur(10px);
 
       .title {
         font-size: 4.8vw;
@@ -107,6 +110,16 @@
       font-weight: 500;
       line-height: 110%;
       color: #000;
+
+      .visual-tit-line-wrap {
+        display: block;
+        overflow: hidden;
+      }
+
+      .visual-tit-line {
+        display: block;
+        transform: translateY(100%);
+      }
     }
 
     .visual-sub-tit {
@@ -190,6 +203,7 @@
       cursor: pointer;
 
       .desc {
+        z-index: 7; // real-work-item보다 위에 쌓이게
         padding: 10px 20px;
         position: absolute;
         top: 50%;
@@ -253,16 +267,16 @@
       letter-spacing: 5px;
       font-size: 4.8vw;
       font-weight: 600;
-      color: #fff;
       text-transform: uppercase;
       overflow: hidden;
       cursor: pointer;
 
-      span {
+      button {
         display: flex;
         width: max-content;
         white-space: nowrap;
         animation: marquee 20s linear infinite;
+        color: #fff;
       }
     }
   }
@@ -274,6 +288,7 @@
       margin-bottom: 30px;
     }
     .content-list {
+      width: 100%;
       overflow: hidden;
       position: relative;
       border-top: 1px solid #fff;
@@ -282,6 +297,7 @@
 
       &::before {
         position: absolute;
+        inset: 0;
         content: '';
         width: 100%;
         height: 100%;
@@ -549,7 +565,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 100%;
+        width: 80%;
         height: 150%;
         background-size: cover;
         background-repeat: no-repeat;
@@ -662,6 +678,7 @@
   }
 
   .next-work {
+    position: relative;
     width: 100%;
     height: 100vh;
     display: flex;
@@ -670,21 +687,24 @@
 
     .inner {
       .next-work-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 0;
-        background: none;
+        z-index: 10;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: var(--font-anton);
+        font-size: 6vw;
         color: #fff;
-
-        .arrow {
-          display: inline-flex;
-          width: 16px;
-          height: 16px;
-          border-radius: 50%;
-          transform: translateY(0) rotate(90deg);
-        }
       }
+    }
+
+    .work-matter {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
     }
   }
 }
@@ -755,21 +775,6 @@
     .next-work {
       .inner {
         .next-work-btn {
-          .arrow {
-            transform: translateY(0) rotate(90deg);
-            width: 8px;
-            height: 8px;
-
-            svg {
-              width: 40%;
-            }
-          }
-
-          &:hover {
-            .arrow {
-              transform: translateY(0) rotate(90deg);
-            }
-          }
         }
       }
     }

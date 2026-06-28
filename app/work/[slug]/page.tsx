@@ -9,6 +9,8 @@ import Image from 'next/image';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import { CustomEase } from 'gsap/dist/CustomEase';
 import { usePageTransition } from '@/hooks/usePageTransition';
+// ── Matter.js ──
+import Matter from 'matter-js';
 
 gsap.registerPlugin(ScrollTrigger, CustomEase);
 
@@ -26,12 +28,13 @@ export default function WorkList() {
 
   const { navigate } = usePageTransition();
 
-  // 다음 work로 이동
+  // ── Matter.js ref ──
+  const matterRef = useRef<HTMLDivElement | null>(null);
+
   const currentIndex = workData.findIndex((w) => w.slug === slug);
   const nextIndex = (currentIndex + 1) % workData.length;
   const nextWork = workData[nextIndex];
 
-  // 뒤로가기 gsap 초기화
   useEffect(() => {
     window.history.pushState(null, '', window.location.href);
 
@@ -81,6 +84,16 @@ export default function WorkList() {
           scrub: true,
         },
       });
+
+      gsap.to(fakeBg.current, {
+        width: '100%',
+        scrollTrigger: {
+          trigger: visualWrap.current,
+          start: 'top center',
+          end: 'bottom center',
+          scrub: true,
+        },
+      });
     });
 
     ScrollTrigger.refresh();
@@ -91,6 +104,130 @@ export default function WorkList() {
       }
     };
   }, []);
+
+  // ── Matter.js 스타트 ──
+  useEffect(() => {
+    if (!matterRef.current) return;
+
+    const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Body } = Matter;
+
+    const section = matterRef.current;
+    const width = section.clientWidth;
+    const height = section.clientHeight;
+
+    const engine = Engine.create();
+    engine.gravity.y = 0;
+
+    const trigger = ScrollTrigger.create({
+      trigger: section,
+      start: 'top 70%',
+      onEnter: () => {
+        engine.gravity.y = 1;
+      },
+    });
+
+    const render = Render.create({
+      element: section,
+      engine,
+      options: {
+        width,
+        height,
+        wireframes: false,
+        background: 'transparent',
+      },
+    });
+
+    const balls = Array.from({ length: 30 }, () => {
+      const radius = Math.random() * 40 + 40;
+      const faceNum = Math.floor(Math.random() * 5) + 1;
+
+      return Bodies.circle(Math.random() * (width - 100) + 50, Math.random() * 200, radius, {
+        restitution: 0.8,
+        friction: 0.01,
+        frictionAir: 0.01,
+        render: {
+          sprite: {
+            texture: `/assets/images/faceball${faceNum}.webp`,
+            xScale: (radius * 2) / 750,
+            yScale: (radius * 2) / 750,
+          },
+        },
+      });
+    });
+
+    const floor = Bodies.rectangle(width / 2, height + 20, width, 40, {
+      isStatic: true,
+      render: { fillStyle: '#000' },
+    });
+
+    const leftWall = Bodies.rectangle(-20, height / 2, 40, height, {
+      isStatic: true,
+      render: { visible: false },
+    });
+
+    const rightWall = Bodies.rectangle(width + 20, height / 2, 40, height, {
+      isStatic: true,
+      render: { visible: false },
+    });
+
+    const topWall = Bodies.rectangle(width / 2, -20, width, 40, {
+      isStatic: true,
+      render: { visible: false },
+    });
+
+    Composite.add(engine.world, [...balls, floor, leftWall, rightWall, topWall]);
+
+    const mouse = Mouse.create(render.canvas);
+    const mouseConstraint = MouseConstraint.create(engine, {
+      mouse,
+      constraint: {
+        stiffness: 0.15,
+        render: { visible: false },
+      },
+    });
+
+    Composite.add(engine.world, mouseConstraint);
+    render.mouse = mouse;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = render.canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      balls.forEach((ball) => {
+        if (mouseConstraint.body === ball) return;
+
+        const dx = ball.position.x - mouseX;
+        const dy = ball.position.y - mouseY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 120) {
+          const force = (120 - distance) * 0.000005;
+          Body.applyForce(ball, ball.position, {
+            x: dx * force,
+            y: dy * force,
+          });
+        }
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    Render.run(render);
+    const runner = Runner.create();
+    Runner.run(runner, engine);
+
+    return () => {
+      trigger.kill();
+      window.removeEventListener('mousemove', handleMouseMove);
+      Render.stop(render);
+      Runner.stop(runner);
+      Composite.clear(engine.world, false);
+      Engine.clear(engine);
+      render.canvas.remove();
+    };
+  }, []);
+  // ── Matter.js 끝 ──
 
   if (!work) return null;
 
@@ -187,20 +324,17 @@ export default function WorkList() {
             </div>
           </div>
         </div>
+
+        {/* ── next-work + Matter.js ── */}
         <div className="next-work">
+          <div className="work-matter" ref={matterRef} aria-hidden="true" role="presentation" />
           <div className="inner">
             <button className="next-work-btn" onClick={() => navigate(`/work/${nextWork.slug}`)}>
               <p>GO TO THE NEXT WORK</p>
-              <div className="arrow">
-                <svg width="55" height="81" viewBox="0 0 55 81" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <line x1="27.5" y1="1" x2="27.5" y2="81" stroke="currentColor"></line>
-                  <line x1="27.3536" y1="0.646447" x2="54.3536" y2="27.6464" stroke="currentColor"></line>
-                  <line y1="-0.5" x2="38.1838" y2="-0.5" transform="matrix(-0.707107 0.707107 0.707107 0.707107 28 1)" stroke="currentColor"></line>
-                </svg>
-              </div>
             </button>
           </div>
         </div>
+        {/* ── next-work + Matter.js 끝 ── */}
       </div>
     </>
   );
