@@ -107,6 +107,7 @@ export default function WorkList() {
 
   // ── Matter.js 스타트 ──
   useEffect(() => {
+    const isMobile = window.innerWidth <= 1023;
     if (!matterRef.current) return;
 
     const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Body } = Matter;
@@ -137,7 +138,7 @@ export default function WorkList() {
       },
     });
 
-    const balls = Array.from({ length: 30 }, () => {
+    const balls = Array.from({ length: isMobile ? 15 : 30 }, () => {
       const radius = Math.random() * 40 + 40;
       const faceNum = Math.floor(Math.random() * 5) + 1;
 

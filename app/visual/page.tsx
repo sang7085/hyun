@@ -72,6 +72,7 @@ export default function VisualPage() {
 
   useLayoutEffect(() => {
     // ── Three.js 세팅 ──
+    const isMobile = window.innerWidth <= 1023;
     const canvas = canvasRef.current!;
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -79,7 +80,7 @@ export default function VisualPage() {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(-0.15, 0, 0.3);
+    camera.position.set(isMobile ? 0 : -0.15, 0, 0.3);
 
     const ambient = new THREE.AmbientLight(0xffffff, 1.5);
     scene.add(ambient);
@@ -120,7 +121,11 @@ export default function VisualPage() {
 
         scene.add(model);
 
-        gsap.set(itemRefs.current, { y: 100, opacity: 0, filter: 'blur(10px)' });
+        gsap.set(itemRefs.current, {
+          y: isMobile ? 0 : 100,
+          opacity: 0,
+          filter: 'blur(10px)',
+        });
 
         const sequence = { frame: 0 };
 
@@ -182,7 +187,6 @@ export default function VisualPage() {
               {
                 y: -100,
                 opacity: 0,
-                // filter: "blur(10px)",
                 ease: 'none',
                 duration: 0.3,
               },
@@ -221,6 +225,29 @@ export default function VisualPage() {
       renderer.dispose();
       ctx.revert(); // ScrollTrigger 포함 전부 정리
     };
+  }, []);
+
+  // 시퀀스 캐릭터 ground 애니메이션
+  useLayoutEffect(() => {
+    const rings = gsap.utils.toArray<SVGElement>('.ring').reverse();
+
+    gsap
+      .timeline({
+        repeat: -1,
+        repeatDelay: 0.2,
+      })
+      .to(rings, {
+        opacity: 0,
+        duration: 0.35,
+        stagger: 0.12,
+        ease: 'power1.out',
+      })
+      .to(rings, {
+        opacity: (_, target) => Number(target.getAttribute('opacity')),
+        duration: 0.35,
+        stagger: 0.12,
+        ease: 'power1.in',
+      });
   }, []);
 
   return (
@@ -262,17 +289,26 @@ export default function VisualPage() {
           </h2>
         </div>
 
-        <canvas
-          aria-hidden="true"
-          ref={canvasRef}
-          style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100vh',
-            display: 'block',
-            opacity: 0,
-          }}
-        />
+        <div className="canvas-wrap">
+          <canvas
+            aria-hidden="true"
+            ref={canvasRef}
+            style={{
+              position: 'absolute',
+              width: '100%',
+              height: '100vh',
+              display: 'block',
+              opacity: 0,
+            }}
+          />
+
+          <svg className="ground" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet">
+            {[470, 400, 330, 260, 190].map((rx, i) => (
+              <ellipse key={i} className={`ring ring-${i}`} cx="500" cy="160" rx={rx} ry={rx * 0.22} fill="none" stroke="black" strokeWidth="1" opacity={0.12 - i * 0.015} />
+            ))}
+          </svg>
+        </div>
+
         <div className="item-wrap">
           {items.map((item, i) => (
             <div

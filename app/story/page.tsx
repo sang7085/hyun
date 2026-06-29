@@ -14,20 +14,19 @@ export default function StoryPage() {
     h: 0,
   });
 
-
   const d = `
   M ${size.w * 0.55} 0
 
   C ${size.w * 0.05} ${size.h * 0.15},
-    ${size.w * 0.10} ${size.h * 0.30},
-    ${size.w * 0.52} ${size.h * 0.40}
+    ${size.w * 0.1} ${size.h * 0.3},
+    ${size.w * 0.52} ${size.h * 0.4}
 
   C ${size.w * 0.95} ${size.h * 0.48},
-    ${size.w * 0.90} ${size.h * 0.60},
+    ${size.w * 0.9} ${size.h * 0.6},
     ${size.w * 0.52} ${size.h * 0.68}
 
   C ${size.w * 0.05} ${size.h * 0.75},
-    ${size.w * 0.10} ${size.h * 0.92},
+    ${size.w * 0.1} ${size.h * 0.92},
     ${size.w * 0.55} ${size.h}
 `;
 
@@ -70,7 +69,6 @@ export default function StoryPage() {
         start: 'top +=30%',
         end: '+=200%',
         scrub: true,
-        // markers: true,
       },
     });
 
@@ -126,20 +124,8 @@ export default function StoryPage() {
 
   return (
     <section className="story-section" ref={sectionRef}>
-      <svg
-        className="story-path"
-        width="100%"
-        height="100%"
-        viewBox={`0 0 ${size.w} ${size.h}`}
-        preserveAspectRatio="xMidYMid meet"
-      >
-        <path
-          ref={pathRef}
-          d={d}
-          fill="none"
-          stroke="#fff"
-          strokeWidth="8"
-        />
+      <svg className="story-path" width="100%" height="100%" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="xMidYMid meet">
+        <path ref={pathRef} d={d} fill="none" stroke="#fff" strokeWidth="8" />
       </svg>
 
       <p className="story-text">

@@ -9,10 +9,30 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function ContactPage() {
   const sceneRef = useRef<HTMLDivElement | null>(null);
+  const contactRef = useRef<HTMLAnchorElement | null>(null);
   const isVisualReady = useVisualStore((s) => s.isVisualReady);
 
   useEffect(() => {
+    if (!contactRef.current || !isVisualReady) return;
+
+    const chars = contactRef.current.querySelectorAll('.char');
+
+    gsap.to(chars, {
+      y: 0,
+      opacity: 1,
+      duration: 0.8,
+      ease: 'power3.out',
+      stagger: 0.07,
+      scrollTrigger: {
+        trigger: contactRef.current,
+        start: 'top 80%',
+      },
+    });
+  }, [isVisualReady]);
+
+  useEffect(() => {
     if (!sceneRef.current || !isVisualReady) return;
+    const isMobile = window.innerWidth <= 1023;
 
     const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Body } = Matter;
 
@@ -27,7 +47,6 @@ export default function ContactPage() {
     const trigger = ScrollTrigger.create({
       trigger: section,
       start: 'top 70%',
-      // markers: true,
 
       onEnter: () => {
         engine.gravity.y = 1;
@@ -45,7 +64,7 @@ export default function ContactPage() {
       },
     });
 
-    const balls = Array.from({ length: 30 }, () => {
+    const balls = Array.from({ length: isMobile ? 15 : 30 }, () => {
       const radius = Math.random() * 40 + 40; // 40~80
       const faceNum = Math.floor(Math.random() * 5) + 1; // 1~5 랜덤
 
@@ -158,11 +177,15 @@ export default function ContactPage() {
   return (
     <>
       <section id="contact" className="contact-section">
-        <div className="contact-wrap">
-          <a href="mailto:sang7085@gmail.com" className="contact" aria-label="이메일로 연락하기 (sang7085@gmail.com)">
-            CONTACT
-          </a>
-        </div>
+        <a href="mailto:sang7085@gmail.com" className="contact-wrap" ref={contactRef}>
+          <span className="char-wrap">
+            {'CONTACT'.split('').map((char, i) => (
+              <span key={i} className="char">
+                {char}
+              </span>
+            ))}
+          </span>
+        </a>
         <div className="matter-wrap" ref={sceneRef} aria-hidden="true" role="presentation" />
       </section>
     </>

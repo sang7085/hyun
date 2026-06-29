@@ -16,21 +16,20 @@ export default function WorkPage() {
   const { navigate } = usePageTransition();
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // 호버 프리뷰 관련 state
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [previewY, setPreviewY] = useState(0);
+  const contentWrapRef = useRef<HTMLDivElement>(null);
+
   useLayoutEffect(() => {
     if (!isVisualReady) return;
-    console.log('isVisualReady:', isVisualReady);
     const ctx = gsap.context(() => {
       const items = gsap.utils.toArray<HTMLElement>('.work-item');
       const textEls = gsap.utils.toArray<HTMLElement>('.work-text-item');
-      const totalFlips = workData.length - 1;
+      const totalFlips = 3;
 
-      gsap.set(textEls, {
-        yPercent: 100,
-      });
-
-      gsap.set(textEls[0], {
-        yPercent: -50,
-      });
+      gsap.set(textEls, { yPercent: 100 });
+      gsap.set(textEls[0], { yPercent: -50 });
 
       items.forEach((item, i) => {
         gsap.set(item, {
@@ -38,13 +37,8 @@ export default function WorkPage() {
           z: i * -1,
           opacity: 0,
           visibility: 'hidden',
-          // pointerEvents: 'none',
         });
-
-        gsap.set([items[0], items[1]], {
-          opacity: 1,
-          visibility: 'visible',
-        });
+        gsap.set([items[0], items[1]], { opacity: 1, visibility: 'visible' });
       });
 
       const tl = gsap.timeline({
@@ -62,61 +56,11 @@ export default function WorkPage() {
       });
 
       for (let i = 0; i < totalFlips; i++) {
-        if (items[i + 1]) {
-          tl.set(
-            items[i + 1],
-            {
-              opacity: 1,
-              // pointerEvents: 'auto'
-              visibility: 'visible',
-            },
-            i
-          );
-        }
-
-        if (items[i]) {
-          tl.set(
-            items[i],
-            {
-              opacity: 0,
-              visibility: 'hidden',
-              // pointerEvents: 'none'
-            },
-            i + 1
-          );
-        }
-
-        tl.to(
-          wrapRef.current,
-          {
-            rotateX: (i + 1) * 180,
-            ease: 'power2.out',
-          },
-          i
-        );
-
-        if (textEls[i]) {
-          tl.to(
-            textEls[i],
-            {
-              yPercent: -200,
-              ease: 'power2.out',
-            },
-            i
-          );
-        }
-
-        if (textEls[i + 1]) {
-          tl.to(
-            textEls[i + 1],
-            {
-              yPercent: -50,
-              filter: 'blur(0px)',
-              ease: 'power2.out',
-            },
-            i
-          );
-        }
+        if (items[i + 1]) tl.set(items[i + 1], { opacity: 1, visibility: 'visible' }, i);
+        if (items[i]) tl.set(items[i], { opacity: 0, visibility: 'hidden' }, i + 1);
+        tl.to(wrapRef.current, { rotateX: (i + 1) * 180, ease: 'power2.out' }, i);
+        if (textEls[i]) tl.to(textEls[i], { yPercent: -200, ease: 'power2.out' }, i);
+        if (textEls[i + 1]) tl.to(textEls[i + 1], { yPercent: -50, filter: 'blur(0px)', ease: 'power2.out' }, i);
       }
     }, sectionRef);
 
@@ -126,21 +70,28 @@ export default function WorkPage() {
     };
   }, [isVisualReady]);
 
-  const handleEnter = (e: React.MouseEvent<HTMLElement>) => {
-    const el = e.currentTarget;
-    el.classList.remove('active-up', 'active-down');
+  // all works 리스트 호버 진입 — li 중앙 Y를 content-wrap 기준으로 계산
+  const handleAllWorkEnter = (e: React.MouseEvent<HTMLElement>, i: number) => {
+    e.currentTarget.classList.remove('active-up', 'active-down');
+
+    const elRect = e.currentTarget.getBoundingClientRect();
+    const wrapRect = contentWrapRef.current!.getBoundingClientRect();
+
+    // content-wrap 상단 기준 상대 Y + li 높이 절반 = li 세로 중앙
+    const centerY = elRect.top - wrapRect.top + elRect.height / 2;
+
+    setPreviewY(centerY);
+    setHoveredIndex(i);
   };
 
-  const handleLeave = (e: React.MouseEvent<HTMLElement>) => {
+  // all works 리스트 호버 이탈
+  const handleAllWorkLeave = (e: React.MouseEvent<HTMLElement>) => {
     const el = e.currentTarget;
     const rect = el.getBoundingClientRect();
     const centerY = rect.top + rect.height / 2;
+    el.classList.add(e.clientY < centerY ? 'active-up' : 'active-down');
 
-    if (e.clientY < centerY) {
-      el.classList.add('active-up');
-    } else {
-      el.classList.add('active-down');
-    }
+    setHoveredIndex(null);
   };
 
   return (
@@ -149,18 +100,19 @@ export default function WorkPage() {
         <h2 id="visual-heading" className="sr-only">
           Work
         </h2>
+
         <div className="flip-wrap" ref={sectionRef}>
           <ul className="text-item-wrap">
-            {workData.map((project, i) => (
+            {workData.slice(0, 4).map((project, i) => (
               <li key={i} className="work-text-item">
                 <button type="button" tabIndex={-1} onClick={() => navigate(`/work/${project.slug}`)} className="marquee-btn">
-                  {project.marquee.repeat(2)}
+                  {project.marquee}
                 </button>
               </li>
             ))}
           </ul>
           <div className="work-item-wrap" ref={wrapRef}>
-            {workData.map((project, i) => (
+            {workData.slice(0, 4).map((project, i) => (
               <div key={i} className="work-item">
                 <div className="desc">{project.title}</div>
                 <Image src={project.thumbnail} alt={project.title} fill sizes="(max-width: 768px) 100vw, 384px" />
@@ -168,15 +120,13 @@ export default function WorkPage() {
             ))}
           </div>
           <div className="real-work">
-            {workData.map((project, i) => (
+            {workData.slice(0, 4).map((project, i) => (
               <button
                 key={i}
                 role="button"
                 aria-label={`${project.title} 상세 보기`}
                 className="real-work-item"
-                style={{
-                  zIndex: workData.length - i,
-                }}
+                style={{ zIndex: workData.length - i }}
                 onClick={() => navigate(`/work/${project.slug}`)}
                 tabIndex={0}
                 aria-hidden={false}
@@ -184,18 +134,39 @@ export default function WorkPage() {
             ))}
           </div>
         </div>
-        <div className="content-wrap">
+
+        <div className="content-wrap" ref={contentWrapRef}>
+          {hoveredIndex !== null && (
+            <div
+              className="hover-preview"
+              style={{
+                top: previewY,
+              }}
+            >
+              <Image src={workData[hoveredIndex].thumbnail} alt={workData[hoveredIndex].title} fill sizes="20vw" />
+            </div>
+          )}
+
           <div className="inner">
             <p className="all-title">[ALL WORKS]</p>
           </div>
+
           {workData.map((project, i) => (
-            <button type="button" key={i} className="content-list" onClick={() => navigate(`/work/${project.slug}`)} onMouseEnter={handleEnter} onMouseLeave={handleLeave}>
+            <button
+              type="button"
+              key={i}
+              className="content-list"
+              onClick={() => navigate(`/work/${project.slug}`)}
+              onMouseEnter={(e) => handleAllWorkEnter(e, i)} // 인덱스 전달
+              onMouseLeave={handleAllWorkLeave}
+            >
               <div className="info-wrap">
                 <div className="inner">
                   <div className="tit-wrap">
                     <h3 className="tit">{project.title}</h3>
                   </div>
                   <div className="text-wrap">
+                    {/* <p>{project.awardsText}</p> */}
                     <p>{project.year}</p>
                   </div>
                 </div>
