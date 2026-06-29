@@ -160,6 +160,12 @@ export default function VisualPage() {
             scrub: 1,
             pin: true,
             onUpdate: (self) => {
+              if (self.progress < 0.01) {
+                gsap.set(sequenceRef.current, { opacity: 1 });
+                gsap.set(textRef1.current, { opacity: 1, pointerEvents: 'auto' });
+                gsap.set(textRef2.current, { opacity: 1, pointerEvents: 'auto' });
+              }
+
               if (self.progress > 0.3) {
                 sectionRef.current?.classList.add('canvas-bg');
               } else {
@@ -181,14 +187,12 @@ export default function VisualPage() {
 
         tl.to(gearRef.current, {
           rotate: 180,
-          // width: breakpoint === 'mobile' ? '1200px' : breakpoint === 'tablet' ? '2000px' : breakpoint === 'smallPc' ? '2500px' : '3000px',
-          // height: breakpoint === 'mobile' ? '1200px' : breakpoint === 'tablet' ? '2000px' : breakpoint === 'smallPc' ? '2500px' : '3000px',
           scale: breakpoint === 'mobile' ? 15 : breakpoint === 'tablet' ? 50 : breakpoint === 'smallPc' ? 70 : 100,
           ease: 'none',
         });
 
-        tl.to(textRef1.current, { display: 'none' }, '<');
-        tl.to(textRef2.current, { display: 'none' }, '<');
+        tl.to(textRef1.current, { opacity: 0, pointerEvents: 'none' }, '<');
+        tl.to(textRef2.current, { opacity: 0, pointerEvents: 'none' }, '<');
 
         tl.addLabel('items-start');
 
