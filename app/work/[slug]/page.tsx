@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import { CustomEase } from 'gsap/dist/CustomEase';
 import { usePageTransition } from '@/hooks/usePageTransition';
+import { useBreakpoint } from '@/hooks/useBreakPoint';
 // ── Matter.js ──
 import Matter from 'matter-js';
 
@@ -16,7 +17,7 @@ gsap.registerPlugin(ScrollTrigger, CustomEase);
 
 export default function WorkList() {
   const mm = gsap.matchMedia();
-
+  const { isMobile, isTablet, isSmallPc, isBelowPc } = useBreakpoint();
   const visualWrap = useRef(null);
   const visualImg = useRef(null);
   const fakeBg = useRef(null);
@@ -24,7 +25,6 @@ export default function WorkList() {
   const params = useParams();
   const slug = params.slug as string;
   const work = workData.find((w) => w.slug === slug);
-  const [isMobile, setIsMobile] = useState(false);
 
   const { navigate } = usePageTransition();
 
@@ -59,10 +59,6 @@ export default function WorkList() {
     setTimeout(() => {
       window.scrollTo(0, 0);
     }, 0);
-
-    if (window.innerWidth < 1024) {
-      setIsMobile(true);
-    }
 
     gsap.to(visualImg.current, {
       y: '10%',
@@ -138,8 +134,8 @@ export default function WorkList() {
       },
     });
 
-    const balls = Array.from({ length: isMobile ? 15 : 30 }, () => {
-      const radius = Math.random() * 40 + 40;
+    const balls = Array.from({ length: isBelowPc ? 15 : 30 }, () => {
+      const radius = isBelowPc ? Math.random() * 20 + 20 : Math.random() * 40 + 40; // mobile: 20~40, pc: 40~80
       const faceNum = Math.floor(Math.random() * 5) + 1;
 
       return Bodies.circle(Math.random() * (width - 100) + 50, Math.random() * 200, radius, {

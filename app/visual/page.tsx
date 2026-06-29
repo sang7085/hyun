@@ -8,6 +8,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { useVisualStore } from '@/store/useVisualStore';
 import { useLoadingStore } from '@/store/useLoadingStore';
+import { useBreakpoint } from '@/hooks/useBreakPoint';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,6 +22,7 @@ export default function VisualPage() {
   const itemRefs = useRef<HTMLDivElement[]>([]);
   const isLoading = useLoadingStore((state) => state.isLoading); // loading 끝났는 지   여부
   const setVisualReady = useVisualStore((s) => s.setVisualReady); // visual 섹션 scrollTrigger가 활성화되면 true로 변경
+  const { isMobile, isTablet, isSmallPc, isBelowPc, breakpoint } = useBreakpoint();
 
   const items = [
     {
@@ -72,7 +74,6 @@ export default function VisualPage() {
 
   useLayoutEffect(() => {
     // ── Three.js 세팅 ──
-    const isMobile = window.innerWidth <= 1023;
     const canvas = canvasRef.current!;
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -80,7 +81,7 @@ export default function VisualPage() {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(isMobile ? 0 : -0.15, 0, 0.3);
+    camera.position.set(isBelowPc ? 0 : -0.15, 0, 0.3);
 
     const ambient = new THREE.AmbientLight(0xffffff, 1.5);
     scene.add(ambient);
@@ -122,7 +123,7 @@ export default function VisualPage() {
         scene.add(model);
 
         gsap.set(itemRefs.current, {
-          y: isMobile ? 0 : 100,
+          y: isSmallPc ? 0 : 100,
           opacity: 0,
           filter: 'blur(10px)',
         });
@@ -158,7 +159,7 @@ export default function VisualPage() {
 
         tl.to(gearRef.current, {
           rotate: 180,
-          scale: 100,
+          scale: breakpoint === 'mobile' ? 30 : breakpoint === 'tablet' ? 50 : breakpoint === 'smallPc' ? 70 : 100,
           ease: 'none',
         });
 
@@ -258,7 +259,13 @@ export default function VisualPage() {
       <div className="section-pin-wrap" ref={sectionRef}>
         <div className="img-box">
           <img className="sequence-image" ref={sequenceRef} src="/sequence/frame_01.webp" alt="시퀀스 애니메이션 이미지" />
+          <svg className="ground" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet">
+            {[470, 400, 330, 260, 190].map((rx, i) => (
+              <ellipse key={i} className={`ring ring-${i}`} cx="500" cy="160" rx={rx} ry={rx * 0.22} fill="none" stroke="black" strokeWidth="1" opacity={0.12 - i * 0.015} />
+            ))}
+          </svg>
         </div>
+
         <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
           <defs>
             <clipPath id="gear" clipPathUnits="objectBoundingBox">
@@ -289,25 +296,17 @@ export default function VisualPage() {
           </h2>
         </div>
 
-        <div className="canvas-wrap">
-          <canvas
-            aria-hidden="true"
-            ref={canvasRef}
-            style={{
-              position: 'absolute',
-              width: '100%',
-              height: '100vh',
-              display: 'block',
-              opacity: 0,
-            }}
-          />
-
-          <svg className="ground" viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet">
-            {[470, 400, 330, 260, 190].map((rx, i) => (
-              <ellipse key={i} className={`ring ring-${i}`} cx="500" cy="160" rx={rx} ry={rx * 0.22} fill="none" stroke="black" strokeWidth="1" opacity={0.12 - i * 0.015} />
-            ))}
-          </svg>
-        </div>
+        <canvas
+          aria-hidden="true"
+          ref={canvasRef}
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100vh',
+            display: 'block',
+            opacity: 0,
+          }}
+        />
 
         <div className="item-wrap">
           {items.map((item, i) => (

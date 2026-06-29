@@ -5,9 +5,11 @@ import Matter from 'matter-js';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useVisualStore } from '@/store/useVisualStore';
+import { useBreakpoint } from '@/hooks/useBreakPoint';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function ContactPage() {
+  const { isMobile, isTablet, isSmallPc, isBelowPc } = useBreakpoint();
   const sceneRef = useRef<HTMLDivElement | null>(null);
   const contactRef = useRef<HTMLAnchorElement | null>(null);
   const isVisualReady = useVisualStore((s) => s.isVisualReady);
@@ -32,7 +34,6 @@ export default function ContactPage() {
 
   useEffect(() => {
     if (!sceneRef.current || !isVisualReady) return;
-    const isMobile = window.innerWidth <= 1023;
 
     const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Body } = Matter;
 
@@ -64,8 +65,8 @@ export default function ContactPage() {
       },
     });
 
-    const balls = Array.from({ length: isMobile ? 15 : 30 }, () => {
-      const radius = Math.random() * 40 + 40; // 40~80
+    const balls = Array.from({ length: isBelowPc ? 15 : 30 }, () => {
+      const radius = isBelowPc ? Math.random() * 20 + 20 : Math.random() * 40 + 40; // mobile: 20~40, pc: 40~80
       const faceNum = Math.floor(Math.random() * 5) + 1; // 1~5 랜덤
 
       return Bodies.circle(Math.random() * (width - 100) + 50, Math.random() * 200, radius, {
