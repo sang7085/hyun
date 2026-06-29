@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${pretendard.variable} ${russoOne.variable} ${anton.variable}`}>
       <head>
-        <Script id="gtm" strategy="afterInteractive">
+        <Script id="gtm" strategy="beforeInteractive">
           {`
             (function(w,d,s,l,i){
               w[l]=w[l]||[];

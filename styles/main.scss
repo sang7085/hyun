@@ -43,6 +43,7 @@
         z-index: 2;
         object-fit: contain;
         pointer-events: none;
+        opacity: 0;
       }
       .ground {
         position: absolute;
@@ -50,6 +51,7 @@
         left: 50%;
         transform: translateX(-50%);
         width: 70%;
+        opacity: 0;
       }
     }
   }
@@ -97,6 +99,7 @@
     background-color: #000;
     clip-path: url(#gear);
     overflow: hidden;
+    opacity: 0;
   }
 
   .title-wrap {
