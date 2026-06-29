@@ -94,8 +94,8 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 50px;
-    height: 50px;
+    width: 150px;
+    height: 150px;
     background-color: #000;
     clip-path: url(#gear);
     overflow: hidden;
@@ -863,6 +863,10 @@
   .work-container {
     .work-head {
       margin: 0 0 8vh;
+    }
+
+    .work-matter {
+      pointer-events: none;
     }
   }
 }

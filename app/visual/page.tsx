@@ -68,15 +68,27 @@ export default function VisualPage() {
       },
       '-=0.2'
     );
-    tl.to(sequenceRef.current, {
-      opacity: 1,
-    });
-    tl.to(gearRef.current, {
-      opacity: 1,
-    });
-    tl.to(groundRef.current, {
-      opacity: 1,
-    });
+    tl.to(
+      sequenceRef.current,
+      {
+        opacity: 1,
+      },
+      '-=0.4'
+    );
+    tl.to(
+      gearRef.current,
+      {
+        opacity: 1,
+      },
+      '-=0.4'
+    );
+    tl.to(
+      groundRef.current,
+      {
+        opacity: 1,
+      },
+      '-=0.4'
+    );
   }, [isLoading]);
 
   // ── loading 끝나고 visual 모션 엔드 ─
@@ -169,7 +181,9 @@ export default function VisualPage() {
 
         tl.to(gearRef.current, {
           rotate: 180,
-          scale: breakpoint === 'mobile' ? 30 : breakpoint === 'tablet' ? 50 : breakpoint === 'smallPc' ? 70 : 100,
+          // width: breakpoint === 'mobile' ? '1200px' : breakpoint === 'tablet' ? '2000px' : breakpoint === 'smallPc' ? '2500px' : '3000px',
+          // height: breakpoint === 'mobile' ? '1200px' : breakpoint === 'tablet' ? '2000px' : breakpoint === 'smallPc' ? '2500px' : '3000px',
+          scale: breakpoint === 'mobile' ? 15 : breakpoint === 'tablet' ? 50 : breakpoint === 'smallPc' ? 70 : 100,
           ease: 'none',
         });
 
