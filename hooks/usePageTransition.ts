@@ -37,21 +37,21 @@ export function usePageTransition() {
     gsap
       .timeline()
       .to(overlayWhite, {
-        scale: 1,
-        duration: 0.6,
+        scale: 2,
+        duration: 1,
         ease: 'cubic-bezier(0.7, 0, 1, 1)',
         onComplete: () => router.push(href),
       })
       .to(overlayBlack, {
         delay: 0.6,
-        scale: 1,
-        duration: 0.6,
+        scale: 2,
+        duration: 1,
         ease: 'cubic-bezier(0.4, 0, 1, 1)',
       })
       // 둘 다 동시에 fadeout
       .to([overlayWhite, overlayBlack], {
         opacity: 0,
-        duration: 0.6,
+        duration: 1,
         ease: 'none',
         onComplete: () => {
           setTransitionDone(true);
