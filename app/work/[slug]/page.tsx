@@ -30,11 +30,56 @@ export default function WorkList() {
 
   // ── Matter.js ref ──
   const matterRef = useRef<HTMLDivElement | null>(null);
-
   const currentIndex = workData.findIndex((w) => w.slug === slug);
   const nextIndex = (currentIndex + 1) % workData.length;
   const nextWork = workData[nextIndex];
 
+  // ── char 이벤트 ──
+  const nextWorkBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  // 진입 stagger — next-work 섹션 보일 때 글자 올라옴
+  useEffect(() => {
+    if (!nextWorkBtnRef.current) return;
+
+    const masks = nextWorkBtnRef.current.querySelectorAll('.char-mask');
+
+    gsap.set(masks, { y: '100%', opacity: 0 });
+
+    gsap.to(masks, {
+      y: '0%',
+      opacity: 1,
+      duration: 0.8,
+      ease: 'power3.out',
+      stagger: 0.03,
+      scrollTrigger: {
+        trigger: nextWorkBtnRef.current,
+        start: 'top 80%',
+      },
+    });
+  }, []);
+
+  // hover시 char-inner stagger 효과
+  const handleNextWorkEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const inners = e.currentTarget.querySelectorAll('.char-inner');
+    gsap.to(inners, {
+      y: '-1em',
+      duration: 0.4,
+      stagger: 0.03,
+      ease: 'power2.out',
+    });
+  };
+
+  const handleNextWorkLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const inners = e.currentTarget.querySelectorAll('.char-inner');
+    gsap.to(inners, {
+      y: '0em',
+      duration: 0.4,
+      stagger: 0.03,
+      ease: 'power2.out',
+    });
+  };
+
+  // ── 페이지 이동 이벤트 ──
   useEffect(() => {
     window.history.pushState(null, '', window.location.href);
 
@@ -49,6 +94,7 @@ export default function WorkList() {
     };
   }, []);
 
+  // ── 스크롤 이벤트 ──
   useEffect(() => {
     if (!work) return;
 
@@ -326,8 +372,19 @@ export default function WorkList() {
         <div className="next-work">
           <div className="work-matter" ref={matterRef} aria-hidden="true" role="presentation" />
           <div className="inner">
-            <button className="next-work-btn" onClick={() => navigate(`/work/${nextWork.slug}`)}>
-              <p>GO TO THE NEXT WORK</p>
+            <button className="next-work-btn" ref={nextWorkBtnRef} onClick={() => navigate(`/work/${nextWork.slug}`)} onMouseEnter={handleNextWorkEnter} onMouseLeave={handleNextWorkLeave}>
+              <p>
+                <span className="hover-chars">
+                  {'NEXT WORK'.split('').map((char, i) => (
+                    <span key={i} className="char-mask">
+                      <span className="char-inner">
+                        <span className="char-original">{char === ' ' ? '\u00A0' : char}</span>
+                        <span className="char-clone">{char === ' ' ? '\u00A0' : char}</span>
+                      </span>
+                    </span>
+                  ))}
+                </span>
+              </p>
             </button>
           </div>
         </div>

@@ -14,6 +14,7 @@ export default function ContactPage() {
   const contactRef = useRef<HTMLAnchorElement | null>(null);
   const isVisualReady = useVisualStore((s) => s.isVisualReady);
 
+  // 기존 스크롤 진입 stagger — 그대로 유지
   useEffect(() => {
     if (!contactRef.current || !isVisualReady) return;
 
@@ -31,6 +32,27 @@ export default function ContactPage() {
       },
     });
   }, [isVisualReady]);
+
+  // hover시 char-inner만 따로 움직임 — 진입 애니메이션과 별개로 동작
+  const handleMouseEnter = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const inners = e.currentTarget.querySelectorAll('.char-inner');
+    gsap.to(inners, {
+      y: '-1em',
+      duration: 0.4,
+      stagger: 0.03,
+      ease: 'power2.out',
+    });
+  };
+
+  const handleMouseLeave = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const inners = e.currentTarget.querySelectorAll('.char-inner');
+    gsap.to(inners, {
+      y: '0em',
+      duration: 0.4,
+      stagger: 0.03,
+      ease: 'power2.out',
+    });
+  };
 
   useEffect(() => {
     if (!sceneRef.current || !isVisualReady) return;
@@ -66,8 +88,8 @@ export default function ContactPage() {
     });
 
     const balls = Array.from({ length: isBelowPc ? 15 : 30 }, () => {
-      const radius = isBelowPc ? Math.random() * 20 + 20 : Math.random() * 40 + 40; // mobile: 20~40, pc: 40~80
-      const faceNum = Math.floor(Math.random() * 5) + 1; // 1~5 랜덤
+      const radius = isBelowPc ? Math.random() * 20 + 20 : Math.random() * 40 + 40;
+      const faceNum = Math.floor(Math.random() * 5) + 1;
 
       return Bodies.circle(Math.random() * (width - 100) + 50, Math.random() * 200, radius, {
         restitution: 0.8,
@@ -85,30 +107,22 @@ export default function ContactPage() {
 
     const floor = Bodies.rectangle(width / 2, height + 20, width, 40, {
       isStatic: true,
-      render: {
-        fillStyle: '#000',
-      },
+      render: { fillStyle: '#000' },
     });
 
     const leftWall = Bodies.rectangle(-20, height / 2, 40, height, {
       isStatic: true,
-      render: {
-        visible: false,
-      },
+      render: { visible: false },
     });
 
     const rightWall = Bodies.rectangle(width + 20, height / 2, 40, height, {
       isStatic: true,
-      render: {
-        visible: false,
-      },
+      render: { visible: false },
     });
 
     const topWall = Bodies.rectangle(width / 2, -20, width, 40, {
       isStatic: true,
-      render: {
-        visible: false,
-      },
+      render: { visible: false },
     });
 
     Composite.add(engine.world, [...balls, floor, leftWall, rightWall, topWall]);
@@ -119,9 +133,7 @@ export default function ContactPage() {
       mouse,
       constraint: {
         stiffness: 0.15,
-        render: {
-          visible: false,
-        },
+        render: { visible: false },
       },
     });
 
@@ -129,28 +141,20 @@ export default function ContactPage() {
 
     render.mouse = mouse;
 
-    // 마우스 근처 지나가면 공 밀어내기
     const handleMouseMove = (e: MouseEvent) => {
       const rect = render.canvas.getBoundingClientRect();
-
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
 
       balls.forEach((ball) => {
         if (mouseConstraint.body === ball) return;
-
         const dx = ball.position.x - mouseX;
         const dy = ball.position.y - mouseY;
-
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < 120) {
           const force = (120 - distance) * 0.000005;
-
-          Body.applyForce(ball, ball.position, {
-            x: dx * force,
-            y: dy * force,
-          });
+          Body.applyForce(ball, ball.position, { x: dx * force, y: dy * force });
         }
       });
     };
@@ -164,31 +168,60 @@ export default function ContactPage() {
     return () => {
       trigger.kill();
       window.removeEventListener('mousemove', handleMouseMove);
-
       Render.stop(render);
       Runner.stop(runner);
-
       Composite.clear(engine.world, false);
       Engine.clear(engine);
-
       render.canvas.remove();
     };
   }, [isVisualReady]);
 
   return (
-    <>
-      <section id="contact" className="contact-section">
-        <a href="mailto:sang7085@gmail.com" className="contact-wrap" ref={contactRef}>
-          <span className="char-wrap">
-            {'CONTACT'.split('').map((char, i) => (
-              <span key={i} className="char">
-                {char}
+    <section id="contact" className="contact-section">
+      <a href="mailto:sang7085@gmail.com" className="contact-wrap" ref={contactRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <span className="char-wrap">
+          {'CONTACT'.split('').map((char, i) => (
+            <span key={i} className="char">
+              <span className="char-inner">
+                <span className="char-original">{char}</span>
+                <span className="char-clone">{char}</span>
+              </span>
+            </span>
+          ))}
+        </span>
+      </a>
+
+      <div className="info-wrap">
+        {/* 전화번호 */}
+        <a href="tel:010-6899-7085" className="contact-tel" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+          <span className="hover-chars">
+            {'+82) 10-6899-7085'.split('').map((char, i) => (
+              <span key={i} className="char-mask">
+                <span className="char-inner">
+                  <span className="char-original">{char}</span>
+                  <span className="char-clone">{char}</span>
+                </span>
               </span>
             ))}
           </span>
         </a>
-        <div className="matter-wrap" ref={sceneRef} aria-hidden="true" role="presentation" />
-      </section>
-    </>
+
+        {/* 이메일 */}
+        <a href="mailto:sang7085@gmail.com" className="contact-mail" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+          <span className="hover-chars">
+            {'sang7085@gmail.com'.split('').map((char, i) => (
+              <span key={i} className="char-mask">
+                <span className="char-inner">
+                  <span className="char-original">{char}</span>
+                  <span className="char-clone">{char}</span>
+                </span>
+              </span>
+            ))}
+          </span>
+        </a>
+      </div>
+
+      <div className="matter-wrap" ref={sceneRef} aria-hidden="true" role="presentation" />
+    </section>
   );
 }

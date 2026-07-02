@@ -7,6 +7,10 @@ body {
   width: 100%;
   max-width: 95vw;
   margin: 0 auto;
+
+  @media (max-width: 1023px) {
+    max-width: 90vw;
+  }
 }
 
 .sr-only {
@@ -31,6 +35,10 @@ header {
   width: 100%;
   z-index: 1000;
   mix-blend-mode: difference;
+
+  .hover-chars {
+    gap: 0;
+  }
 
   .inner {
     position: relative;
@@ -77,6 +85,10 @@ header {
   }
 
   @media (max-width: 1023px) {
+    .inner {
+      max-width: 90vw;
+    }
+
     .logo {
       button {
         font-size: 24px;
@@ -130,5 +142,28 @@ main {
 
   .loading-char {
     display: inline-block;
+  }
+}
+
+.hover-chars {
+  display: inline-flex;
+  gap: 4px;
+
+  .char-mask {
+    display: inline-block;
+    overflow: hidden;
+    height: 1em;
+  }
+
+  .char-inner {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .char-original,
+  .char-clone {
+    display: block;
+    height: 1em;
+    line-height: 1;
   }
 }

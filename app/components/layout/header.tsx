@@ -4,15 +4,13 @@ import gsap from 'gsap';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import PlusIcon from '@/app/components/icon/PlusIcon';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { usePageTransition } from '@/hooks/usePageTransition';
+import HoverChars from '@/app/components/effect/HoverChars';
+import { usePathname } from 'next/navigation';
 
 gsap.registerPlugin(ScrollToPlugin);
 
 export default function Header() {
   const pathname = usePathname();
-  const { navigate } = usePageTransition();
   const isWorkPage = pathname.startsWith('/work');
 
   const handleNav = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -30,7 +28,16 @@ export default function Header() {
       <div className="inner">
         <h1 className="logo">
           <button onClick={() => (window.location.href = '/')} aria-label="홈으로 이동">
-            HYUN.
+            <span className="hover-chars">
+              {'HYUN.'.split('').map((char, i) => (
+                <span key={i} className="char-mask">
+                  <span className="char-inner">
+                    <span className="char-original">{char}</span>
+                    <span className="char-clone">{char}</span>
+                  </span>
+                </span>
+              ))}
+            </span>
           </button>
         </h1>
         {!isWorkPage ? (
@@ -38,17 +45,17 @@ export default function Header() {
             <ul>
               <li>
                 <a href="#visual" onClick={(e) => handleNav(e, 'visual')} aria-label="visual 섹션으로 이동">
-                  VISUAL
+                  <HoverChars text="VISUAL" />
                 </a>
               </li>
               <li>
                 <a href="#work" onClick={(e) => handleNav(e, 'work')} aria-label="work 섹션으로 이동">
-                  WORK
+                  <HoverChars text="WORK" />
                 </a>
               </li>
               <li>
                 <a href="#contact" onClick={(e) => handleNav(e, 'contact')} aria-label="contact 섹션으로 이동">
-                  CONTACT
+                  <HoverChars text="CONTACT" />
                 </a>
               </li>
             </ul>
@@ -58,9 +65,9 @@ export default function Header() {
             <ul>
               <li>
                 {/* Link사용시 클라이언트 네비게이션이라 GSAP 상태가 그대로 유지되어
-              button태그로 진행 */}
+                button태그로 진행 */}
                 <button aria-label="홈으로 이동" onClick={() => (window.location.href = '/')}>
-                  HOME
+                  <HoverChars text="HOME" />
                 </button>
               </li>
             </ul>

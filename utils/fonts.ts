@@ -1,5 +1,5 @@
-import localFont from 'next/font/local'
-import { Russo_One, Anton } from 'next/font/google'
+import localFont from 'next/font/local';
+import { Russo_One, Anton } from 'next/font/google';
 
 export const pretendard = localFont({
   src: [
@@ -58,10 +58,10 @@ export const russoOne = Russo_One({
   subsets: ['latin'],
   weight: '400',
   variable: '--font-russo-one',
-})
+});
 
 export const anton = Anton({
   subsets: ['latin'],
   weight: '400',
   variable: '--font-anton',
-})
+});

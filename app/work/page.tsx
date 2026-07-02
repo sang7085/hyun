@@ -16,7 +16,7 @@ export default function WorkPage() {
   const { navigate } = usePageTransition();
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // 호버 프리뷰 관련 state
+  // all work hover 관련
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [previewY, setPreviewY] = useState(0);
   const contentWrapRef = useRef<HTMLDivElement>(null);
@@ -82,6 +82,15 @@ export default function WorkPage() {
 
     setPreviewY(centerY);
     setHoveredIndex(i);
+
+    // 제목 글자 hover 효과 — char-inner를 위로 올려 clone 노출
+    const inners = e.currentTarget.querySelectorAll('.char-inner');
+    gsap.to(inners, {
+      y: '-1em',
+      duration: 0.4,
+      stagger: 0.03,
+      ease: 'power2.out',
+    });
   };
 
   // all works 리스트 호버 이탈
@@ -92,6 +101,15 @@ export default function WorkPage() {
     el.classList.add(e.clientY < centerY ? 'active-up' : 'active-down');
 
     setHoveredIndex(null);
+
+    // 제목 글자 원위치
+    const inners = el.querySelectorAll('.char-inner');
+    gsap.to(inners, {
+      y: '0em',
+      duration: 0.4,
+      stagger: 0.03,
+      ease: 'power2.out',
+    });
   };
 
   return (
@@ -105,7 +123,19 @@ export default function WorkPage() {
           <ul className="text-item-wrap">
             {workData.slice(0, 4).map((project, i) => (
               <li key={i} className="work-text-item">
-                <button type="button" tabIndex={-1} onClick={() => navigate(`/work/${project.slug}`)} className="marquee-btn">
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={() => navigate(`/work/${project.slug}`)}
+                  className="marquee-btn"
+                  data-text={project.marquee}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.closest('.work-text-item')?.classList.add('text-fill-active');
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.closest('.work-text-item')?.classList.remove('text-fill-active');
+                  }}
+                >
                   {project.marquee}
                 </button>
               </li>
@@ -126,8 +156,17 @@ export default function WorkPage() {
                 role="button"
                 aria-label={`${project.title} 상세 보기`}
                 className="real-work-item"
-                style={{ zIndex: workData.length - i }}
+                style={{
+                  zIndex: i === activeIndex ? 10 : 0, // 현재 활성화된 카드만 위로
+                  pointerEvents: i === activeIndex ? 'auto' : 'none', // 나머지는 클릭/hover 막기
+                }}
                 onClick={() => navigate(`/work/${project.slug}`)}
+                onMouseEnter={() => {
+                  document.querySelectorAll('.work-text-item')[i]?.classList.add('text-fill-active');
+                }}
+                onMouseLeave={() => {
+                  document.querySelectorAll('.work-text-item')[i]?.classList.remove('text-fill-active');
+                }}
                 tabIndex={0}
                 aria-hidden={false}
               />
@@ -143,12 +182,13 @@ export default function WorkPage() {
                 top: previewY,
               }}
             >
+              <div className="awards">{workData[hoveredIndex].awards && <img src={workData[hoveredIndex].awards} alt="" />}</div>
               <Image src={workData[hoveredIndex].thumbnail} alt={workData[hoveredIndex].title} fill sizes="20vw" />
             </div>
           )}
 
           <div className="inner">
-            <p className="all-title">[ALL WORKS]</p>
+            <p className="all-title">AWARDS & ALL WORKS</p>
           </div>
 
           {workData.map((project, i) => (
@@ -163,7 +203,18 @@ export default function WorkPage() {
               <div className="info-wrap">
                 <div className="inner">
                   <div className="tit-wrap">
-                    <h3 className="tit">{project.title}</h3>
+                    <h3 className="tit">
+                      <span className="hover-chars">
+                        {project.title.split('').map((char, j) => (
+                          <span key={j} className="char-mask">
+                            <span className="char-inner">
+                              <span className="char-original">{char}</span>
+                              <span className="char-clone">{char}</span>
+                            </span>
+                          </span>
+                        ))}
+                      </span>
+                    </h3>
                   </div>
                   <div className="text-wrap">
                     {/* <p>{project.awardsText}</p> */}

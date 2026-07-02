@@ -17,9 +17,9 @@ export default function VisualPage() {
   const sequenceRef = useRef<HTMLImageElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const gearRef = useRef<HTMLDivElement>(null);
-  const groundRef = useRef<SVGSVGElement>(null);
   const textRef1 = useRef<HTMLDivElement>(null);
   const textRef2 = useRef<HTMLDivElement>(null);
+  const scrollDown = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<HTMLDivElement[]>([]);
   const isLoading = useLoadingStore((state) => state.isLoading); // loading 끝났는 지   여부
   const setVisualReady = useVisualStore((s) => s.setVisualReady); // visual 섹션 scrollTrigger가 활성화되면 true로 변경
@@ -47,7 +47,6 @@ export default function VisualPage() {
     if (isLoading) return;
 
     const lines1 = textRef1.current?.querySelectorAll('.visual-tit-line');
-    const lines2 = textRef2.current?.querySelectorAll('.visual-tit-line');
 
     const tl = gsap.timeline();
 
@@ -57,41 +56,16 @@ export default function VisualPage() {
       ease: 'power2.out',
       stagger: 0.15,
     });
-
-    tl.to(
-      lines2 ?? [],
-      {
-        y: '0%',
-        duration: 0.8,
-        ease: 'power2.out',
-        stagger: 0.15,
-      },
-      '-=0.2'
-    );
-    tl.to(
-      sequenceRef.current,
-      {
-        opacity: 1,
-      },
-      '-=0.4'
-    );
-    tl.to(
-      gearRef.current,
-      {
-        opacity: 1,
-      },
-      '-=0.4'
-    );
-    tl.to(
-      groundRef.current,
-      {
-        opacity: 1,
-      },
-      '-=0.4'
-    );
+    tl.to(sequenceRef.current, {
+      opacity: 1,
+    });
+    tl.to(gearRef.current, {
+      opacity: 1,
+    });
   }, [isLoading]);
 
   // ── loading 끝나고 visual 모션 엔드 ─
+
   // ── visual 스크롤모션 스타트 ──
 
   useLayoutEffect(() => {
@@ -156,7 +130,7 @@ export default function VisualPage() {
           scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top top',
-            end: '+=900%',
+            end: '+=700%',
             scrub: 1,
             pin: true,
             onUpdate: (self) => {
@@ -186,8 +160,9 @@ export default function VisualPage() {
         });
 
         tl.to(gearRef.current, {
+          duration: 0.5,
           rotate: 180,
-          scale: breakpoint === 'mobile' ? 15 : breakpoint === 'tablet' ? 50 : breakpoint === 'smallPc' ? 70 : 100,
+          scale: breakpoint === 'mobile' ? 15 : breakpoint === 'tablet' ? 50 : breakpoint === 'smallPc' ? 70 : 30,
           ease: 'none',
         });
 
@@ -275,7 +250,7 @@ export default function VisualPage() {
         opacity: (_, target) => Number(target.getAttribute('opacity')),
         duration: 0.35,
         stagger: 0.12,
-        ease: 'power1.in',
+        ease: 'power1.out',
       });
   }, []);
 
@@ -286,12 +261,12 @@ export default function VisualPage() {
       </h2>
       <div className="section-pin-wrap" ref={sectionRef}>
         <div className="img-box">
-          <img className="sequence-image" ref={sequenceRef} src="/sequence/frame_01.webp" alt="시퀀스 애니메이션 이미지" />
-          <svg className="ground" ref={groundRef} viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet">
+          <img className="sequence-image" ref={sequenceRef} src="/sequence/frame_01.webp" alt="시퀀스 애니메이션 이미지" loading="eager" />
+          {/* <svg className="ground" ref={groundRef} viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet">
             {[470, 400, 330, 260, 190].map((rx, i) => (
               <ellipse key={i} className={`ring ring-${i}`} cx="500" cy="160" rx={rx} ry={rx * 0.22} fill="none" stroke="black" strokeWidth="1" opacity={0.12 - i * 0.015} />
             ))}
-          </svg>
+          </svg> */}
         </div>
 
         <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
@@ -306,20 +281,7 @@ export default function VisualPage() {
         <div className="title-wrap" ref={textRef1}>
           <h2 className="visual-tit">
             <span className="visual-tit-line-wrap">
-              <span className="visual-tit-line">INTERACTIVE</span>
-            </span>
-            <span className="visual-tit-line-wrap">
-              <span className="visual-tit-line">PUBLISHING</span>
-            </span>
-          </h2>
-        </div>
-        <div className="title-wrap right" ref={textRef2}>
-          <h2 className="visual-tit">
-            <span className="visual-tit-line-wrap">
-              <span className="visual-tit-line">USER</span>
-            </span>
-            <span className="visual-tit-line-wrap">
-              <span className="visual-tit-line">EXPERIENCE</span>
+              <span className="visual-tit-line">HI I'M HYUN.</span>
             </span>
           </h2>
         </div>
@@ -349,6 +311,10 @@ export default function VisualPage() {
               <p className="desc">{item.desc}</p>
             </div>
           ))}
+        </div>
+
+        <div className="scroll-down" ref={scrollDown}>
+          [ SCROLL DOWN ]
         </div>
       </div>
     </section>
