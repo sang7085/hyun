@@ -24,6 +24,7 @@ export default function VisualPage() {
   const isLoading = useLoadingStore((state) => state.isLoading); // loading 끝났는 지   여부
   const setVisualReady = useVisualStore((s) => s.setVisualReady); // visual 섹션 scrollTrigger가 활성화되면 true로 변경
   const { isMobile, isTablet, isSmallPc, isBelowPc, breakpoint } = useBreakpoint();
+  const gearScale = isMobile ? 15 : isTablet ? 30 : isSmallPc ? 30 : 50;
 
   const items = [
     {
@@ -162,7 +163,7 @@ export default function VisualPage() {
         tl.to(gearRef.current, {
           duration: 0.5,
           rotate: 180,
-          scale: breakpoint === 'mobile' ? 15 : breakpoint === 'tablet' ? 50 : breakpoint === 'smallPc' ? 70 : 30,
+          scale: gearScale,
           ease: 'none',
         });
 

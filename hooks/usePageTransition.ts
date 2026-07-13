@@ -39,14 +39,14 @@ export function usePageTransition() {
       .to(overlayWhite, {
         scale: 2,
         duration: 1,
-        ease: 'cubic-bezier(0.7, 0, 1, 1)',
+        ease: 'cubic-bezier(.87, 0, .13, 1)',
         onComplete: () => router.push(href),
       })
       .to(overlayBlack, {
         delay: 0.6,
         scale: 2,
         duration: 1,
-        ease: 'cubic-bezier(0.4, 0, 1, 1)',
+        ease: 'cubic-bezier(.87, 0, .13, 1)',
       })
       // 둘 다 동시에 fadeout
       .to([overlayWhite, overlayBlack], {
