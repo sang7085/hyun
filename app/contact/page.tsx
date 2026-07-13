@@ -178,6 +178,7 @@ export default function ContactPage() {
 
   return (
     <section id="contact" className="contact-section">
+      <div className="matter-wrap" ref={sceneRef} aria-hidden="true" role="presentation" />
       <a href="mailto:sang7085@gmail.com" className="contact-wrap" ref={contactRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
         <span className="char-wrap">
           {'CONTACT'.split('').map((char, i) => (
@@ -220,8 +221,6 @@ export default function ContactPage() {
           </span>
         </a>
       </div>
-
-      <div className="matter-wrap" ref={sceneRef} aria-hidden="true" role="presentation" />
     </section>
   );
 }

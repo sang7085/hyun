@@ -9,14 +9,13 @@ export function usePageTransition() {
   const setTransitionDone = useTransitionStore((s) => s.setTransitionDone);
 
   const navigate = (href: string) => {
-    const overlayWhite = document.createElement('div');
-    overlayWhite.style.cssText = `
+    const overlayGray = document.createElement('div');
+    overlayGray.style.cssText = `
       position: fixed;
       inset: 0;
-      background: #f4f2f1;
+      background: #111;
       z-index: 9999;
-      transform: scale(0);
-      transform-origin: center;
+      transform: translateY(100%);
       pointer-events: none;
     `;
 
@@ -26,39 +25,50 @@ export function usePageTransition() {
       inset: 0;
       background: #000;
       z-index: 10000;
-      transform: scale(0);
-      transform-origin: center;
+      transform: translateY(100%);
       pointer-events: none;
     `;
 
-    document.body.appendChild(overlayWhite);
+    document.body.appendChild(overlayGray);
     document.body.appendChild(overlayBlack);
 
     gsap
       .timeline()
-      .to(overlayWhite, {
-        scale: 2,
-        duration: 1,
-        ease: 'cubic-bezier(.87, 0, .13, 1)',
-        onComplete: () => router.push(href),
-      })
-      .to(overlayBlack, {
-        delay: 0.6,
-        scale: 2,
-        duration: 1,
+      .to(overlayGray, {
+        y: '0%',
+        duration: 0.8,
         ease: 'cubic-bezier(.87, 0, .13, 1)',
       })
-      // 둘 다 동시에 fadeout
-      .to([overlayWhite, overlayBlack], {
-        opacity: 0,
-        duration: 1,
-        ease: 'none',
-        onComplete: () => {
-          setTransitionDone(true);
-          document.body.removeChild(overlayWhite);
-          document.body.removeChild(overlayBlack);
+      .to(
+        overlayBlack,
+        {
+          y: '0%',
+          duration: 0.8,
+          ease: 'cubic-bezier(.87, 0, .13, 1)',
+          onComplete: () => router.push(href),
         },
-      });
+        '<0.15'
+      )
+      .to(overlayBlack, {
+        y: '-100%',
+        duration: 0.8,
+        delay: 0.2,
+        ease: 'cubic-bezier(.87, 0, .13, 1)',
+      })
+      .to(
+        overlayGray,
+        {
+          y: '-100%',
+          duration: 0.8,
+          ease: 'cubic-bezier(.87, 0, .13, 1)',
+          onComplete: () => {
+            setTransitionDone(true);
+            document.body.removeChild(overlayGray);
+            document.body.removeChild(overlayBlack);
+          },
+        },
+        '<0.15'
+      );
   };
 
   return { navigate };

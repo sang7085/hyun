@@ -138,7 +138,7 @@ export default function VisualPage() {
               if (self.progress < 0.01) {
                 gsap.set(sequenceRef.current, { opacity: 1 });
                 gsap.set(textRef1.current, { opacity: 1, pointerEvents: 'auto' });
-                gsap.set(textRef2.current, { opacity: 1, pointerEvents: 'auto' });
+                // gsap.set(textRef2.current, { opacity: 1, pointerEvents: 'auto' });
               }
 
               if (self.progress > 0.3) {
@@ -168,7 +168,7 @@ export default function VisualPage() {
         });
 
         tl.to(textRef1.current, { opacity: 0, pointerEvents: 'none' }, '<');
-        tl.to(textRef2.current, { opacity: 0, pointerEvents: 'none' }, '<');
+        // tl.to(textRef2.current, { opacity: 0, pointerEvents: 'none' }, '<');
 
         tl.addLabel('items-start');
 
