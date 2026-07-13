@@ -106,15 +106,15 @@ export default function WorkList() {
       window.scrollTo(0, 0);
     }, 0);
 
-    gsap.to(visualImg.current, {
-      y: '10%',
-      scrollTrigger: {
-        trigger: visualWrap.current,
-        start: 'top center',
-        end: 'bottom bottom',
-        scrub: true,
-      },
-    });
+    // gsap.to(visualImg.current, {
+    //   y: '10%',
+    //   scrollTrigger: {
+    //     trigger: visualWrap.current,
+    //     start: 'top center',
+    //     end: 'bottom bottom',
+    //     scrub: true,
+    //   },
+    // });
 
     mm.add('(min-width: 1024px)', () => {
       gsap.to(fakeBg.current, {
