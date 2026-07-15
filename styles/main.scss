@@ -2,6 +2,7 @@
 @use './base/typography';
 @use './base/globals';
 
+// ── visual section css start ──
 .visual-section {
   position: relative;
   z-index: 2;
@@ -241,8 +242,8 @@
     z-index: 10;
   }
 }
-
-// -------------- work-section start
+// ── visual section css end ──
+// ── work section css start ──
 
 .work-section {
   position: relative;
@@ -519,6 +520,8 @@
     transform: translateX(-50%);
   }
 }
+// ── work section css end ──
+// ── story section css start ──
 
 .story-section {
   position: relative;
@@ -563,25 +566,60 @@
     }
   }
 }
+// ── story section css end ──
+// ── about section css start ──
 
 .about-section {
   position: relative;
+  padding: 50vh 0;
   width: 100%;
-  height: 100vh;
   background: #000;
+  // background: linear-gradient(180deg, #f4f2f1 0%, #d9d4d2 100%);
 
   .img-box {
-    position: relative;
-    width: 30%;
-    height: 100%;
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translateY(-50%);
+    width: 50vw;
+
+    &.left {
+      img {
+        transform: rotateY(180deg);
+      }
+    }
+    &.right {
+      left: unset;
+    }
+  }
+
+  .fist-bomb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 5vw;
+    height: 5vw;
+    font-family: var(--font-anton);
+    font-size: 0.8vw;
+    border-radius: 50%;
+    background-color: #fff;
+    color: #000;
   }
 }
+
+// ── about section css end ──
+// ── contact section css start ──
 
 .contact-section {
   position: relative;
   inset: 0;
   width: 100%;
   height: 100vh;
+  background: #fff;
 
   .contact-wrap {
     z-index: 10;
@@ -640,7 +678,7 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #000;
+    background: #fff;
   }
 
   @media (max-width: 1023px) {
@@ -661,7 +699,8 @@
   }
 }
 
-/////////////////////// work-detail
+// ── contact section css end ──
+// ── work detail css start ──
 
 .work-detail {
   width: 100%;
@@ -895,6 +934,12 @@
           .info {
             margin: 4vh 0 0;
             margin-left: 0;
+
+            .info-head {
+              p {
+                font-size: 16px;
+              }
+            }
           }
         }
       }
@@ -981,3 +1026,5 @@
     }
   }
 }
+
+// ── work detail css end ──

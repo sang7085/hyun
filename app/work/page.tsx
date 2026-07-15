@@ -70,6 +70,33 @@ export default function WorkPage() {
     };
   }, [isVisualReady]);
 
+  useLayoutEffect(() => {
+    if (!isVisualReady) return;
+
+    const ctx = gsap.context(() => {
+      const items = gsap.utils.toArray<HTMLElement>('.content-list');
+
+      items.forEach((item) => {
+        gsap.set(item, { y: 60, opacity: 0 });
+
+        gsap.to(item, {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: item,
+            start: 'top 80%',
+          },
+        });
+      });
+    }, contentWrapRef);
+
+    return () => {
+      ctx.revert();
+    };
+  }, [isVisualReady]);
+
   // all works 리스트 호버 진입 — li 중앙 Y를 content-wrap 기준으로 계산
   const handleAllWorkEnter = (e: React.MouseEvent<HTMLElement>, i: number) => {
     e.currentTarget.classList.remove('active-up', 'active-down');
@@ -145,7 +172,7 @@ export default function WorkPage() {
             {workData.slice(0, 4).map((project, i) => (
               <div key={i} className="work-item">
                 <div className="desc">{project.title}</div>
-                <Image src={project.thumbnail} alt={project.title} fill sizes="(max-width: 768px) 100vw, 384px" />
+                <Image src={project.thumbnail} alt={project.title} fill sizes="(max-width: 768px) 100vw, 384px" priority={i === 0} />
               </div>
             ))}
           </div>
@@ -187,9 +214,9 @@ export default function WorkPage() {
             </div>
           )}
 
-          <div className="inner">
+          {/* <div className="inner">
             <p className="all-title">AWARDS & ALL WORKS</p>
-          </div>
+          </div> */}
 
           {workData.map((project, i) => (
             <button
@@ -217,7 +244,6 @@ export default function WorkPage() {
                     </h3>
                   </div>
                   <div className="text-wrap">
-                    {/* <p>{project.awardsText}</p> */}
                     <p>{project.year}</p>
                   </div>
                 </div>

@@ -1,20 +1,55 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { useLoadingStore } from '@/store/useLoadingStore';
 
 const lines = ['INTERACTIVE', 'PUBLISHING', 'FRONTEND', 'DEVELOP'];
 const hyun = ['H', 'Y', 'U', 'N', '.'];
 
+const sequenceUrls = Array.from({ length: 20 }, (_, i) => `/sequence/frame_${String(i + 1).padStart(2, '0')}.webp`);
+
+function preloadImages(urls: string[]): Promise<void[]> {
+  return Promise.all(
+    urls.map(
+      (url) =>
+        new Promise<void>((resolve, reject) => {
+          const img = new window.Image();
+          img.src = url;
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error(`Failed to load: ${url}`));
+        })
+    )
+  );
+}
+
 export default function Loading() {
   const { isLoading, setLoadingDone } = useLoadingStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const hyunRefs = useRef<HTMLSpanElement[]>([]);
+  const [isAssetsReady, setIsAssetsReady] = useState(false);
 
   useEffect(() => {
     if (!isLoading) return;
+
+    let cancelled = false;
+
+    preloadImages(sequenceUrls)
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        if (!cancelled) setIsAssetsReady(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoading]);
+
+  useEffect(() => {
+    if (!isLoading || !isAssetsReady) return;
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -26,7 +61,6 @@ export default function Loading() {
       },
     });
 
-    // 로딩 gsap 시작
     tl.to(wrapperRef.current, {
       y: '0%',
       duration: 1,
@@ -58,7 +92,6 @@ export default function Loading() {
       ease: 'power2.out',
     });
 
-    // 마지막 li 각 글자 stagger
     tl.from(hyunRefs.current, {
       y: '100%',
       duration: 1,
@@ -67,7 +100,7 @@ export default function Loading() {
     });
 
     tl.to({}, { duration: 0.8 });
-  }, []);
+  }, [isLoading, isAssetsReady]);
 
   if (!isLoading) return null;
 

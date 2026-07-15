@@ -29,15 +29,15 @@ export default function VisualPage() {
   const items = [
     {
       title: 'INTERACTION',
-      desc: `단순히 화면을 만드는 것을 넘어 사용자와 콘텐츠가 자연스럽게 연결될 수 있는 경험을 고민합니다. 스크롤과 모션을 활용해 흐름을 설계하고, 사용자가 머무를 수 있는 인터랙션을 구현합니다.`,
+      desc: `단순히 화면을 만드는 것을 넘어 사용자와 콘텐츠가 자연스럽게 연결될 수 있는 경험을 고민합니다.<br /> 스크롤과 모션을 활용해 흐름을 설계하고, 사용자가 머무를 수 있는 인터랙션을 구현합니다.`,
     },
     {
       title: 'USER EXPERIENCE',
-      desc: `사용자는 복잡한 기능보다 자연스러운 경험을 기억합니다. 직관적인 인터페이스와 부드러운 인터랙션을 통해 사용자가 콘텐츠에 집중할 수 있는 환경을 구현합니다. 작은 디테일 하나까지 사용자 관점에서 고민합니다.`,
+      desc: `사용자는 복잡한 기능보다 자연스러운 경험을 기억합니다.<br /> 직관적인 인터페이스와 부드러운 인터랙션을 통해 사용자가 콘텐츠에 집중할 수 있는 환경을 구현합니다.<br /> 작은 디테일 하나까지 사용자 관점에서 고민합니다.`,
     },
     {
       title: 'GROWTH',
-      desc: `기술은 끊임없이 변화하고 사용자의 기대 역시 높아지고 있습니다. 새로운 기술과 트렌드를 꾸준히 학습하며 실제 프로젝트에 적용하고, 더 나은 결과를 만들기 위해 지속적으로 개선합니다. 성장은 개발자의 가장 중요한 역량이라고 생각합니다.`,
+      desc: `기술은 끊임없이 변화하고 사용자의 기대 역시 높아지고 있습니다.<br /> 새로운 기술과 트렌드를 꾸준히 학습하며 실제 프로젝트에 적용하고, 더 나은 결과를 만들기 위해 지속적으로 개선합니다.<br /> 성장은 개발자의 가장 중요한 역량이라고 생각합니다.`,
     },
   ];
 
@@ -137,7 +137,7 @@ export default function VisualPage() {
             onUpdate: (self) => {
               if (self.progress < 0.01) {
                 gsap.set(sequenceRef.current, { opacity: 1 });
-                gsap.set(textRef1.current, { opacity: 1, pointerEvents: 'auto' });
+                // gsap.set(textRef1.current, { opacity: 1, pointerEvents: 'auto' });
                 // gsap.set(textRef2.current, { opacity: 1, pointerEvents: 'auto' });
               }
 
@@ -232,29 +232,6 @@ export default function VisualPage() {
     };
   }, []);
 
-  // 시퀀스 캐릭터 ground 애니메이션
-  useLayoutEffect(() => {
-    const rings = gsap.utils.toArray<SVGElement>('.ring').reverse();
-
-    gsap
-      .timeline({
-        repeat: -1,
-        repeatDelay: 0.2,
-      })
-      .to(rings, {
-        opacity: 0,
-        duration: 0.35,
-        stagger: 0.12,
-        ease: 'power1.out',
-      })
-      .to(rings, {
-        opacity: (_, target) => Number(target.getAttribute('opacity')),
-        duration: 0.35,
-        stagger: 0.12,
-        ease: 'power1.out',
-      });
-  }, []);
-
   return (
     <section id="visual" className="visual-section" aria-label="visual section">
       <h2 id="visual-heading" className="sr-only">
@@ -263,11 +240,6 @@ export default function VisualPage() {
       <div className="section-pin-wrap" ref={sectionRef}>
         <div className="img-box">
           <img className="sequence-image" ref={sequenceRef} src="/sequence/frame_01.webp" alt="시퀀스 애니메이션 이미지" loading="eager" />
-          {/* <svg className="ground" ref={groundRef} viewBox="0 0 1000 320" preserveAspectRatio="xMidYMid meet">
-            {[470, 400, 330, 260, 190].map((rx, i) => (
-              <ellipse key={i} className={`ring ring-${i}`} cx="500" cy="160" rx={rx} ry={rx * 0.22} fill="none" stroke="black" strokeWidth="1" opacity={0.12 - i * 0.015} />
-            ))}
-          </svg> */}
         </div>
 
         <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
@@ -309,7 +281,7 @@ export default function VisualPage() {
               }}
             >
               <h3 className="title">{item.title}</h3>
-              <p className="desc">{item.desc}</p>
+              <p className="desc" dangerouslySetInnerHTML={{ __html: item.desc }} />
             </div>
           ))}
         </div>

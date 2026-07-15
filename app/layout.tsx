@@ -6,6 +6,7 @@ import { pretendard, russoOne, anton } from '@/utils/fonts';
 import Header from './components/layout/header';
 import LenisProvider from '@/app/components/provider/LenisProvider';
 import ScrollToTop from '@/app/components/layout/scrollToTop';
+import ScrollRestoration from '@/app/components/layout/scrollRestoration';
 import Loading from './components/layout/loading';
 
 export const metadata: Metadata = {
@@ -53,6 +54,8 @@ export default function RootLayout({
         <noscript>
           <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WX3BXNH5" height="0" width="0" style={{ display: 'none', visibility: 'hidden' }}></iframe>
         </noscript>
+
+        <ScrollRestoration />
 
         <Loading />
 
