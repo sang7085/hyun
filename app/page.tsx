@@ -15,7 +15,7 @@ export default function Home() {
     <>
       <VisualPage key={`visual-${pathname}`} />
       <WorkPage key={`work-${pathname}`} />
-      {/* <AboutPage /> */}
+      <AboutPage />
       <ContactPage />
       {/* <StoryPagePage /> */}
     </>

@@ -137,7 +137,7 @@
     }
   }
 
-  @media (max-width: 1023px) {
+  @media (max-width: 1024px) {
     .ground {
       width: 100vw;
     }
@@ -194,7 +194,7 @@
     }
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     .title-wrap {
       top: 20%;
       left: 50%;
@@ -396,8 +396,11 @@
       width: 100%;
       overflow: hidden;
       border-top: 1px solid #fff;
-      border-bottom: 1px solid #fff;
       cursor: pointer;
+
+      &:last-child {
+        border-bottom: 1px solid #fff;
+      }
 
       &::before {
         position: absolute;
@@ -472,7 +475,7 @@
     }
   }
 
-  @media (max-width: 1023px) {
+  @media (max-width: 1024px) {
     .work-item-wrap {
       width: 50vw;
     }
@@ -484,6 +487,9 @@
     }
 
     .content-wrap {
+      .hover-preview {
+        display: none;
+      }
       .all-title {
         font-size: 16px;
         margin-bottom: 16px;
@@ -498,7 +504,7 @@
     }
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     .work-item-wrap {
       width: 75vw;
     }
@@ -571,43 +577,145 @@
 
 .about-section {
   position: relative;
-  padding: 50vh 0;
   width: 100%;
   background: #000;
-  // background: linear-gradient(180deg, #f4f2f1 0%, #d9d4d2 100%);
+  overflow: hidden;
 
-  .img-box {
-    position: absolute;
-    top: 45%;
-    left: 50%;
-    transform: translateY(-50%);
-    width: 50vw;
+  .fist-wrap {
+    position: relative;
+    width: 100%;
+    max-height: 150vh; // 기본 200vh에서 about-intro가 100vh 당겨졌기 때문에 빈공간을 없애기 위해
+    .fist-box {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      .img-box {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translateY(-50%);
+        width: 50vw;
 
-    &.left {
-      img {
-        transform: rotateY(180deg);
+        &.left {
+          img {
+            transform: rotateY(180deg);
+          }
+        }
+        &.right {
+          left: unset;
+        }
+      }
+
+      .fist-bomb {
+        position: absolute;
+        top: 60%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 5vw;
+        height: 5vw;
+        font-family: var(--font-anton);
+        font-size: 0.8vw;
+        border-radius: 50%;
+        background-color: #fff;
+        color: #000;
       }
     }
-    &.right {
-      left: unset;
+
+    .about-intro {
+      position: relative;
+      top: -100vh; // fist가 100vh 먹고 있어서 배치를 위해 -100vh
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15vh 0 0;
+      z-index: 5;
+      width: 100%;
+
+      .profile-img {
+        position: relative;
+        width: 25vw;
+        margin: 0 auto 4vh;
+        aspect-ratio: 3 / 4;
+        overflow: hidden;
+
+        .reveal-wall {
+          position: absolute;
+          top: -1px;
+          left: -1px;
+          right: -1px;
+          bottom: -1px;
+          background: #fff;
+          z-index: 2;
+          transform: translateY(0%) translateZ(0);
+          will-change: transform;
+        }
+      }
+
+      .title-wrap {
+        .about-title {
+          font-family: var(--font-anton);
+          font-size: 64px;
+          line-height: 100%;
+          color: #000;
+          text-align: center;
+        }
+
+        .about-desc {
+          margin: 80px auto 0;
+          max-width: 31vw;
+          color: #000;
+          text-align: center;
+        }
+      }
     }
   }
 
-  .fist-bomb {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 5vw;
-    height: 5vw;
-    font-family: var(--font-anton);
-    font-size: 0.8vw;
-    border-radius: 50%;
-    background-color: #fff;
-    color: #000;
+  @media (max-width: 1024px) {
+    .fist-wrap {
+      // max-height: unset;
+      .fist-box {
+        .fist-bomb {
+          top: 55%;
+        }
+      }
+      .about-intro {
+        padding: 0;
+        .profile-img {
+          width: 100%;
+        }
+        .title-wrap {
+          .about-desc {
+            max-width: 90%;
+          }
+        }
+      }
+    }
+  }
+  @media (max-width: 768px) {
+    .fist-wrap {
+      .fist-box {
+        .fist-bomb {
+          top: 55%;
+        }
+      }
+      .about-intro {
+        padding: 0;
+        .profile-img {
+          width: 100%;
+        }
+        .title-wrap {
+          .about-title {
+            font-size: 32px;
+          }
+          .about-desc {
+            max-width: 90%;
+            margin: 40px auto 0;
+          }
+        }
+      }
+    }
   }
 }
 
@@ -624,13 +732,13 @@
   .contact-wrap {
     z-index: 10;
     position: absolute;
-    top: 60%;
+    top: 55%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-family: var(--font-anton);
     font-size: 10vw;
     line-height: 100%;
-    color: #fff;
+    color: #000;
     height: 20vh;
     overflow: hidden;
 
@@ -665,7 +773,7 @@
     justify-content: center;
     align-items: center;
     gap: 20px;
-    color: #fff;
+    color: #000;
     .contact-tel {
     }
     .contact-mail {
@@ -678,23 +786,31 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: #000;
+    background: #fff;
   }
 
-  @media (max-width: 1023px) {
+  @media (max-width: 1024px) {
     .info-wrap {
       display: block;
+      text-align: center;
       .contact-mail {
         margin-top: 4px;
       }
     }
+
     .contact-wrap {
-      height: 5vh;
+      height: 7vh;
       font-size: 10vw;
     }
 
     .matter-wrap {
       pointer-events: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .contact-wrap {
+      height: 5vh;
     }
   }
 }
@@ -911,7 +1027,7 @@
   }
 }
 
-@media (max-width: 1023px) {
+@media (max-width: 1024px) {
   .work-container {
     .work-head {
       margin: 0 0 8vh;
@@ -923,7 +1039,7 @@
   }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .work-container {
     .content-wrap {
       .about-project {

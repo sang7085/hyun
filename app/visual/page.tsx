@@ -202,7 +202,7 @@ export default function VisualPage() {
           tl.to(
             item,
             {
-              y: 0,
+              y: '-50%',
               opacity: 1,
               filter: 'blur(0px)',
               ease: 'none',

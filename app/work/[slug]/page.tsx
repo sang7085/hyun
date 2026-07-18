@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import { CustomEase } from 'gsap/dist/CustomEase';
 import { usePageTransition } from '@/hooks/usePageTransition';
+import { useTransitionStore } from '@/store/useTransitionStore';
 import { useBreakpoint } from '@/hooks/useBreakPoint';
 // ── Matter.js ──
 import Matter from 'matter-js';
@@ -27,6 +28,7 @@ export default function WorkList() {
   const work = workData.find((w) => w.slug === slug);
 
   const { navigate } = usePageTransition();
+  const setPageReady = useTransitionStore((s) => s.setPageReady); // 추가
 
   // ── Matter.js ref ──
   const matterRef = useRef<HTMLDivElement | null>(null);
@@ -36,6 +38,15 @@ export default function WorkList() {
 
   // ── char 이벤트 ──
   const nextWorkBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (!work) return;
+    setPageReady(true);
+
+    return () => {
+      setPageReady(false);
+    };
+  }, [work, setPageReady]);
 
   // 진입 stagger — next-work 섹션 보일 때 글자 올라옴
   useEffect(() => {
